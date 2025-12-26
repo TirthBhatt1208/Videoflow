@@ -3,10 +3,17 @@ import {
   menuItems,
 } from "../../Data/dashboard.ts";
 import type { SidebarProps } from "../../Types/dashboard.ts";
+import dashboardSection from "../../Store/store.ts";
 
 
 
 function Navbar({activeTab, setActiveTab}: SidebarProps) {
+  const { setid } = dashboardSection();
+
+  const handleClick = (id: string) => {
+    setActiveTab(id);
+    setid(id);
+  }
   return (
     <nav className="flex-1 px-4">
       {menuItems.map((item) => {
@@ -14,7 +21,7 @@ function Navbar({activeTab, setActiveTab}: SidebarProps) {
         return (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => handleClick((item.id))}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all ${
               activeTab === item.id
                 ? "bg-blue-600 text-white"
