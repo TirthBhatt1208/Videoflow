@@ -1,6 +1,7 @@
 import express , {urlencoded} from 'express';
 import cors from 'cors';
 import cookieParser  from 'cookie-parser';
+import { clerkMiddleware } from '@clerk/express';
 
 const app = express();
 
@@ -12,5 +13,5 @@ app.use(express.json({limit: "200mb"}))
 app.use(express.urlencoded({limit: "200mb", extended: true}))
 app.use(express.static('public'))
 app.use(cookieParser())
-
+app.use(clerkMiddleware())
 export default app
