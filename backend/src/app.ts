@@ -7,7 +7,7 @@ import {ensureUser} from "./Middlewares/ensureUser"
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.CORS_ORIGIN,
     credentials: true
 }))
 app.use(express.json({limit: "200mb"}))
