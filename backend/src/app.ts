@@ -2,7 +2,7 @@ import express , {urlencoded} from 'express';
 import cors from 'cors';
 import cookieParser  from 'cookie-parser';
 import { clerkMiddleware } from '@clerk/express';
-import {ensureUser} from "./Middlewares/ensureUser"
+import {ensureUser} from "./Middlewares/ensureUser.js"
 
 const app = express();
 

@@ -1,8 +1,8 @@
-import { prisma } from "../db/index";
-import { ApiError } from "../Utils/apiError";
-import { asyncHandler } from "../Utils/asyncHandler";
+import { prisma } from "../db/index.js";
+import { ApiError } from "../Utils/apiError.js";
+import { asyncHandler } from "../Utils/asyncHandler.js";
 import {getUser} from "../Clerk/createClient"
-import { ErrorStatus, ErrorMessage } from "../Enums/enums";
+import { ErrorStatus, ErrorMessage } from "../Enums/enums.js";
 
 export const ensureUser = asyncHandler(async (req, res, next) => {
   const { userId } = req.auth!;

@@ -1,6 +1,6 @@
 import { createClerkClient } from "@clerk/backend";
-import { ApiError } from "../Utils/apiError";
-import {ErrorStatus , ErrorMessage} from "../Enums/enums"
+import { ApiError } from "../Utils/apiError.js";
+import {ErrorStatus , ErrorMessage} from "../Enums/enums.js"
 
 if (!process.env.CLERK_SECRET_KEY) {
   throw new Error("Missing Clerk secret key");
