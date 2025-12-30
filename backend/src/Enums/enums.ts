@@ -86,6 +86,7 @@ export enum ErrorStatus {
   uploadInvalid = 401,
   uploadTooLarge = 413,
   uploadFailed = 500,
+  uploadFailedOnCloud = 500,
 
   // Queue
   queueFailed = 500,
@@ -128,6 +129,7 @@ export const ErrorMessage = {
   uploadInvalid_401: "Invalid file uploaded.",
   uploadTooLarge_413: "File size exceeds the allowed limit.",
   uploadFailed_500: "File upload failed due to server error.",
+  uploadFailedOnCloud_500: "File upload has been failed on cloudinary",
 
   // Queue
   queueFailed_500: "Queue processing failed.",

@@ -17,4 +17,9 @@ app.use(cookieParser())
 
 app.use(clerkMiddleware())
 app.use(ensureUser)
+
+
+import userRoutes from "./Routes/video.js";
+
+app.use("/api/videos", userRoutes);
 export default app
