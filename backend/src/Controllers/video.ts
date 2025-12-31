@@ -1,11 +1,10 @@
-import { original } from "@reduxjs/toolkit";
 import { ErrorMessage, ErrorStatus, SuccessMessage, SuccessStatus } from "../Enums/enums.js";
 import { ApiError } from "../Utils/apiError.js";
 import { asyncHandler } from "../Utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../Utils/cloudinary.js";
 import { prisma } from "../db/index.js";
 import { ApiResponse } from "../Utils/apiResonse.js";
-import { json } from "node:stream/consumers";
+import { addToMetaDataQueue } from "../Queues/metaData.js";
 
 const uploadVideo = asyncHandler(async (req, res) => {
   if (!req.files || Array.isArray(req.files)) {
@@ -40,7 +39,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
         description: description || "",
       },
     });
-
+    
     if (!dbVideo) {
       throw new ApiError(
         ErrorStatus.uploadFailed,
@@ -51,12 +50,14 @@ const uploadVideo = asyncHandler(async (req, res) => {
     savedVideos.push(dbVideo);
   }
 
+  await addToMetaDataQueue(savedVideos)
+
   return res
     .status(SuccessStatus.uploadSuccess)
     .json(
       new ApiResponse(
         SuccessStatus.uploadSuccess,
-        savedVideos[0],
+        savedVideos,
         SuccessMessage.uploadSuccess_201
       )
     );
