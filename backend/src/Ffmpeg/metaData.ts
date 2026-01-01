@@ -1,6 +1,6 @@
 import {exec} from "child_process"
-import { ApiError } from "../Utils/apiError";
-import { ErrorMessage, ErrorStatus } from "../Enums/enums";
+import { ApiError } from "../Utils/apiError.js";
+import { ErrorMessage, ErrorStatus } from "../Enums/enums.js";
 
 export const extractMetaData = (url: string): Promise<any> => {
   return new Promise((resolve, reject) => {

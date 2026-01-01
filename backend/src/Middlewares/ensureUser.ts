@@ -3,7 +3,6 @@ import { ApiError } from "../Utils/apiError.js";
 import { asyncHandler } from "../Utils/asyncHandler.js";
 import {getUser} from "../Clerk/createClient"
 import { ErrorStatus, ErrorMessage } from "../Enums/enums.js";
-import { log } from "console";
 
 export const ensureUser = asyncHandler(async (req, res, next) => {
   const { userId } = req.auth!;

@@ -41,14 +41,14 @@ model Video {
 
   metadata        Metadata?
   processedFiles  ProcessedFile[]
-  thumbnail       Thumbnail?
+  thumbnail       Thumbnail[]
 }
 
 enum VideoStatus {
   UPLOADED
   QUEUED
   METADATA_EXTRACTED
-  TRANSCODING
+  TRANSCODED
   HLS_READY
   COMPLETED
   FAILED
@@ -90,16 +90,19 @@ model ProcessedFile {
 
 model Thumbnail {
   id        String   @id @default(cuid())
-  videoId   String   @unique
+  videoId   String   
   video     Video    @relation(fields: [videoId], references: [id])
 
   url       String
+  time      Int
   createdAt DateTime @default(now())
+
+  @@index([videoId])
 }
 
 model JobLog {
   id        String   @id @default(cuid())
-  videoId   String
+  videoId   String   
   jobType   String   // "metadata", "transcode", "hls"
   status    String   // "success" | "failed"
   message   String?

@@ -1,5 +1,4 @@
 import { v2 as cloudinary } from "cloudinary";
-import { log } from "console";
 import fs from "fs";
 
 cloudinary.config({
@@ -9,17 +8,19 @@ cloudinary.config({
 });
 
 
-export const uploadOnCloudinary = async (localFilePath : string) => {
+export const uploadOnCloudinary = async (localFilePath : string , type: "image" | "video" = "video") => {
   try {
     if (!localFilePath) return null;
+    const normalized = localFilePath.replace(/\\/g, "/");
     //upload the file on cloudinary
-    //console.log("Local file path: " , localFilePath);
+    console.log("Local file path: " , localFilePath);
     
-    const response = await cloudinary.uploader.upload(localFilePath, {
-      resource_type: "video",
+    const response = await cloudinary.uploader.upload(normalized, {
+      resource_type: `${type}`,
     });
     // file has been uploaded successfull
     //console.log("file is uploaded on cloudinary ", response.url);
+    console.log("file is uploaded on cloudinary" , localFilePath);
     fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {

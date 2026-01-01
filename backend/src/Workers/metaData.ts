@@ -1,9 +1,9 @@
 import { Job, Worker } from "bullmq";
 import IORedis from "ioredis";
-import { extractMetaData } from "../Ffmpeg/metaData";
-import { ApiError } from "../Utils/apiError";
-import { ErrorMessage, ErrorStatus, SuccessMessage } from "../Enums/enums";
-import { prisma } from "../db";
+import { extractMetaData } from "../Ffmpeg/metaData.js";
+import { ApiError } from "../Utils/apiError.js";
+import { ErrorMessage, ErrorStatus, SuccessMessage } from "../Enums/enums.js";
+import { prisma } from "../db/index.js";
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
