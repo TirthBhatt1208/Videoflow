@@ -7,7 +7,7 @@ import { prisma } from "../db/index.js";
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
-const metaDataWorker = new Worker(
+export const metaDataWorker = new Worker(
   "metadata",
   async (job: Job) => {
     const { originalUrl, videoId } = job.data;
@@ -78,11 +78,3 @@ const metaDataWorker = new Worker(
     concurrency: 3,
   }
 );
-
-metaDataWorker.on("completed", (job) => {
-  console.log(`Metadata job ${job.id} completed`);
-});
-
-metaDataWorker.on("failed", (job, err) => {
-  console.error(`Metadata job ${job?.id} failed`, err);
-});

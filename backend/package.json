@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsx watch src/index.ts"
+    "start": "tsx watch src/index.ts",
+    "worker": "npx tsx src/Workers/index.ts"
   },
   "author": "",
   "license": "ISC",

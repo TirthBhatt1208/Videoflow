@@ -16,7 +16,7 @@ type thumbnails = {
     url: string
 }
 
-const thumbnailsWorker = new Worker("thumbnails" , async (job: Job) => {
+export const thumbnailsWorker = new Worker("thumbnails" , async (job: Job) => {
     const {videoId , originalUrl} = job.data
     console.log(`videoId: ${videoId} , originalUrl: ${originalUrl}`)
 
@@ -128,11 +128,3 @@ const thumbnailsWorker = new Worker("thumbnails" , async (job: Job) => {
     }
 
 } , {connection});
-
-thumbnailsWorker.on("completed" , (job) => {
-    console.log(`Thumbnails job ${job.id} completed`);
-});
-
-thumbnailsWorker.on("failed" , (job , err) => {
-    console.error(`Thumbnails job ${job?.id} failed` , err);
-});
