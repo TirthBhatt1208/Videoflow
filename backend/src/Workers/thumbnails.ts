@@ -18,7 +18,6 @@ type thumbnails = {
 
 export const thumbnailsWorker = new Worker("thumbnails" , async (job: Job) => {
     const {videoId , originalUrl} = job.data
-    console.log(`videoId: ${videoId} , originalUrl: ${originalUrl}`)
 
     if(!videoId || !originalUrl) {
         throw new ApiError(ErrorStatus.validationError , ErrorMessage.validationError_422)
@@ -32,42 +31,20 @@ export const thumbnailsWorker = new Worker("thumbnails" , async (job: Job) => {
     );
     fs.mkdirSync(outputPath, { recursive: true });
 
-    console.log("outputPath: " , outputPath)
     await generateThumbnails(originalUrl , outputPath)
-    console.log("reaching here......")
-
-    console.log("REAL OUTPUT PATH:", outputPath);
-    console.log("ABSOLUTE PATH EXISTS:", fs.existsSync(outputPath));
-    console.log("FILES IN ACTUAL FS:", fs.readdirSync(outputPath));
-
-    console.log(
-      "FILES IN /public:",
-      fs.readdirSync(path.join(process.cwd(), "public"))
-    );
-    console.log(
-      "FILES IN /public/thumbnails:",
-      fs.readdirSync(path.join(process.cwd(), "public", "thumbnails"))
-    );
-
 
     const files = await (fs.readdirSync(outputPath))
-        .filter((f) => { console.log("f: " , f); return f.endsWith(".png")})
+        .filter((f) => { return f.endsWith(".png")})
         .sort();
 
     const interval = 2;
     const thumbnails: thumbnails[] = [];
-    console.log("files: " , files)
 
     for (let i = 0; i < files.length; i++) {
         const fileName = files[i];
-        console.log("fileName: " , fileName)
         let fullPath = path.join(outputPath, fileName!);
-        fullPath = fullPath.replace(/\\/g, "/"); // 👈🏼 make path POSIX
-        console.log("Local file path:", fullPath);
-
-        console.log("full path: " , fullPath)
+        fullPath = fullPath.replace(/\\/g, "/");
         const upload = await uploadOnCloudinary(fullPath , "image");
-        console.log(" transcode upload: " , upload)
         if (!upload) {
             throw new ApiError(
                 ErrorStatus.uploadFailedOnCloud,

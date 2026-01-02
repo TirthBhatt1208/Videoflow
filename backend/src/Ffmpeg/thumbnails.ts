@@ -6,7 +6,6 @@ export const generateThumbnails = async(url: string , outputPath: string) => {
 
     return new Promise((resolve , reject) => {
         const ffmpeg = `ffmpeg -i "${url}" -vf "fps=1/2" "${outputPath}/thumb_%04d.png"`;
-        console.log("Thumbnails generated");
 
         exec(ffmpeg, (err) => {
           if (err) {

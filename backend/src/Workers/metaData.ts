@@ -11,7 +11,6 @@ export const metaDataWorker = new Worker(
   "metadata",
   async (job: Job) => {
     const { originalUrl, videoId } = job.data;
-    console.log(`originalUrl: ${originalUrl}, videoId: ${videoId}`);
 
     if (!originalUrl || !videoId) {
       throw new ApiError(
@@ -20,9 +19,7 @@ export const metaDataWorker = new Worker(
       );
     }
 
-    console.log("Starting metadata extraction...");
     const metaData = await extractMetaData(originalUrl);
-    console.log("Metadata extracted:", metaData);
 
     const { duration, width, height, fps, codec, audioCodec, bitrate } =
       metaData;
@@ -46,7 +43,6 @@ export const metaDataWorker = new Worker(
         ErrorMessage.internalError_500
       );
     }
-    console.log("Metadata stored in database:", dbMetaData);
 
     const dbJobLog = await prisma.jobLog.create({
       data: {
@@ -58,10 +54,7 @@ export const metaDataWorker = new Worker(
     });
 
     if (!dbJobLog) {
-      console.error("stroring job on db has been failed!!!");
     }
-
-    console.log("Job log stored in database:", dbJobLog);
 
     await prisma.video.update({
       where: {
