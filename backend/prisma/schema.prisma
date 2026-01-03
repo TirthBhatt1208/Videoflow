@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -15,11 +9,11 @@ datasource db {
 
 model User {
   id           String   @id @default(cuid())
-  clerkId      String   @unique        // Clerk userId
+  clerkId      String   @unique
   email        String
   name         String?
   createdAt    DateTime @default(now())
-  videos       Video[]  // user videos
+  videos       Video[]
 
   @@index([clerkId])
 }
@@ -29,12 +23,13 @@ model Video {
   userId          String
   user            User     @relation(fields: [userId], references: [id])
 
-  originalUrl     String
-  title           String?
-  description     String?
+  originalUrl           String
+  masterPlaylistUrl     String? 
+  title                 String?
+  description           String?
   
   status          VideoStatus @default(UPLOADED)
-  progress        Int         @default(0) // real-time percentage
+  progress        Int         @default(0)
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -54,6 +49,41 @@ enum VideoStatus {
   FAILED
 }
 
+model ProcessedFile {
+  id                  String   @id @default(cuid())
+  videoId             String
+  video               Video    @relation(fields: [videoId], references: [id])
+
+  variant             String   // v0", "v1", "v2", "v3", "v4"
+  resolution          String   // "240p", "360p", "480p", "720p", "1080p"
+  indexPlaylistUrl    String  
+
+  width               Int?
+  height              Int?
+  bitrate             Int?
+
+  segments            Segment[] 
+  createdAt           DateTime @default(now())
+
+  @@unique([videoId, variant]) 
+  @@index([videoId])
+}
+
+model Segment {
+  id                  String   @id @default(cuid())
+  processedFileId     String   // 👈 Changed from 'proccesId'
+  processedFile       ProcessedFile @relation(fields: [processedFileId], references: [id])
+
+  segmentIndex        Int      // 0, 1, 2, 3...
+  url                 String   // Cloudinary URL of .ts file
+  size                Int?     // File size in bytes
+  duration            Float?   // Segment duration in seconds
+
+  createdAt           DateTime @default(now())
+
+  @@index([processedFileId])
+}
+
 model Metadata {
   id        String   @id @default(cuid())
   videoId   String   @unique
@@ -68,24 +98,6 @@ model Metadata {
   bitrate       Int?
 
   createdAt     DateTime @default(now())
-}
-
-model ProcessedFile {
-  id            String   @id @default(cuid())
-  videoId       String
-  video         Video    @relation(fields: [videoId], references: [id])
-
-  resolution    String   // "1080p", "720p", etc
-  playlistUrl   String   // .m3u8 URL
-  baseUrl       String?  // ts chunks base folder
-
-  width         Int?
-  height        Int?
-  bitrate       Int?
-
-  createdAt     DateTime @default(now())
-
-  @@index([videoId])
 }
 
 model Thumbnail {
@@ -108,5 +120,3 @@ model JobLog {
   message   String?
   createdAt DateTime @default(now())
 }
-
-

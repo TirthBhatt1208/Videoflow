@@ -4,6 +4,7 @@ import { extractMetaData } from "../Ffmpeg/metaData.js";
 import { ApiError } from "../Utils/apiError.js";
 import { ErrorMessage, ErrorStatus, SuccessMessage } from "../Enums/enums.js";
 import { prisma } from "../db/index.js";
+import { addToProccessFileQueue } from "../Queues/proccesFile.js";
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
@@ -65,6 +66,8 @@ export const metaDataWorker = new Worker(
         progress: 10,
       },
     });
+
+    await addToProccessFileQueue([{id:videoId , originalUrl}])
   },
   {
     connection,
