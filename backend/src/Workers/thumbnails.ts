@@ -24,10 +24,10 @@ export const thumbnailsWorker = new Worker("thumbnails" , async (job: Job) => {
     }
     
     const outputPath = path.join(
-      process.cwd(),
-      "public",
-      "thumbnails",
-      videoId
+        process.cwd(),
+        "public",
+        "thumbnails",
+        videoId
     );
     fs.mkdirSync(outputPath, { recursive: true });
 
@@ -63,7 +63,10 @@ export const thumbnailsWorker = new Worker("thumbnails" , async (job: Job) => {
         });
     }
 
-    fs.rmSync(outputPath, { recursive: true, force: true });
+    fs.rmSync(path.join(process.cwd(), "public", "thumbnails"), {
+        recursive: true,
+        force: true,
+    });
     
     const dbThumbnails = await prisma.thumbnail.createMany({
         data: thumbnails
