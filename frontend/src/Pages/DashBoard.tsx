@@ -4,6 +4,7 @@ import { Protect } from "@clerk/clerk-react";
 import Signup from "./Signup.tsx";
 import { UserProfile } from "@clerk/clerk-react";
 import dashboardSection from "../Store/store.ts";
+import VideoUpload from "./VideoUpload.tsx";
 const VideoFlowDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const { id } = dashboardSection();
@@ -18,6 +19,12 @@ const VideoFlowDashboard = () => {
             <UserProfile />
           </div>
         );
+        case "upload":
+        return(
+          <div className="flex-1 overflow-auto p-4 flex justify-center">
+            <VideoUpload/>
+          </div>
+        )
       default:
         return <MainContent />; // fallback
     }
