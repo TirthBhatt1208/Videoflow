@@ -86,9 +86,9 @@ function OutputQuality({ files }: { files: UploadFile[] }) {
                 </div>
                 <p className="text-xs text-slate-500 mt-0.5">{desc}</p>
                 {locked && (
-                  <button className="text-xs text-blue-600 hover:text-blue-700 mt-1 font-medium">
+                  <span className="text-xs text-blue-600 hover:text-blue-700 mt-1 font-medium">
                     Upgrade to unlock
-                  </button>
+                  </span>
                 )}
               </div>
             </div>
