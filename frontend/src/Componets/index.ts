@@ -7,6 +7,7 @@ import StatsSection from "./home/StatsSection";
 import WorkflowSection from "./home/Workflowsection";
 import MainContent from "./dashboard/MainContent";
 import Sidebar from "./dashboard/Sidebar";
+import Inputfile from "./dashboard/Inputfile";
 
 export {
     CTASection,
@@ -17,5 +18,6 @@ export {
     StatsSection,
     WorkflowSection,
     MainContent,
-    Sidebar
+    Sidebar,
+    Inputfile
 }

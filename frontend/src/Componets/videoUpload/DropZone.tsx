@@ -1,10 +1,12 @@
-import {useState , useCallback} from 'react'
+import {useState , useCallback , useRef} from 'react'
 import {
   Upload
 } from "lucide-react";
+import {Inputfile} from "../index";
 
 function DropZone() {
     const [isDragging, setIsDragging] = useState(false);
+    const inputRef = useRef<HTMLInputElement | null>(null);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -41,8 +43,19 @@ function DropZone() {
         </h3>
         <p className="text-slate-500 mb-8">or click to browse</p>
 
-        <button className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5">
+        <button
+          onClick={() => inputRef.current!.click()}
+          className="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:-translate-y-0.5"
+        >
           <Upload className="w-5 h-5" />
+          <Inputfile
+            type="file"
+            id="fileUpload"
+            name="fileUpload"
+            ref={inputRef}
+            accept="video/*"
+            className="hidden"
+          />
           Browse Files
         </button>
 

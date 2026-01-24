@@ -36,7 +36,7 @@ function Header() {
               id="fileUpload"
               name="fileUpload"
               ref={inputRef}
-              accept="image/png, image/jpeg"
+              accept="video/*"
               className="hidden"
             />
           </button>

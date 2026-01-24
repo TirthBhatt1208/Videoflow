@@ -4,6 +4,6 @@ import {upload} from "../Middlewares/multer.js"
 
 const router = Router();
 
-router.route("/upload").get(upload.fields([{ name: "videos" , maxCount: 5}]), uploadVideo);
+router.route("/upload").post(upload.fields([{ name: "videos" , maxCount: 5}]), uploadVideo);
 
 export default router;
