@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import {videoUploding} from "../../Store/store"
+import NoVideoUploading from "./NoUploading";
 
 function UploadProccesing() {
   const [uploadProgress, setUploadProgress] = useState({
@@ -8,6 +10,7 @@ function UploadProccesing() {
     timeRemaining: "3 minutes remaining",
     uploadSpeed: "10 MB/s",
   });
+  const {isUploading} = videoUploding()
 
   const [showNetworkWarning, setShowNetworkWarning] = useState(true);
 
@@ -35,6 +38,8 @@ function UploadProccesing() {
   const handleMinimize = () => {
     console.log("Minimized to background");
   };
+
+  if(!isUploading) return <NoVideoUploading/>
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">

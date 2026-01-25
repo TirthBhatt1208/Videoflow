@@ -1,6 +1,7 @@
 import React, { forwardRef } from "react";
 import type { ChangeEvent } from "react";
 import uploadVideos from "../../Api/postApis";
+import dashboardSection , {videoUploding} from "../../Store/store"
 
 interface InputFileProps {
   type: string;
@@ -12,6 +13,9 @@ interface InputFileProps {
 
 const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
   ({ type, id, name, accept, className }, ref) => {
+
+    const {setid , setActiveTab} = dashboardSection()
+    const {setIsUploading} = videoUploding()
     const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
       e.preventDefault();
 
@@ -25,7 +29,11 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
       const files = Array.from(fileList);
       console.log("Files are: ", files);
 
+      setid("videoUploading");
+      setActiveTab("videoUploading");
+      setIsUploading()
       await uploadVideos(files);
+
     };
 
     return (

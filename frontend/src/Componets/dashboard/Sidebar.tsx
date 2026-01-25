@@ -3,8 +3,7 @@ import Logo from "./Logo"
 import UserProfile from './UserProfile';
 import Navbar from './Navbar';
 import Storage from './Storage';
-import type { SidebarProps } from '../../Types/dashboard.ts';
-function Sidebar({activeTab, setActiveTab}: SidebarProps) {
+function Sidebar() {
   return (
     <div className="w-64 bg-slate-900 text-white flex flex-col">
       {/* Logo */}
@@ -14,7 +13,7 @@ function Sidebar({activeTab, setActiveTab}: SidebarProps) {
       <UserProfile />
 
       {/* Navigation */}
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navbar/>
 
       {/* Storage */}
       <Storage />

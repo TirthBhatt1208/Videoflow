@@ -1,12 +1,10 @@
-import React, { useState } from "react";
-import {Sidebar , MainContent} from "../Componets/index.ts";
+import {Sidebar , MainContent , UploadProccesing} from "../Componets/index.ts";
 import { Protect } from "@clerk/clerk-react";
 import Signup from "./Signup.tsx";
 import { UserProfile } from "@clerk/clerk-react";
 import dashboardSection from "../Store/store.ts";
 import VideoUpload from "./VideoUpload.tsx";
 const VideoFlowDashboard = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
   const { id } = dashboardSection();
 
   const renderSection = () => {
@@ -19,12 +17,18 @@ const VideoFlowDashboard = () => {
             <UserProfile />
           </div>
         );
-        case "upload":
-        return(
+      case "upload":
+        return (
           <div className="flex-1 overflow-auto p-4 flex justify-center">
-            <VideoUpload/>
+            <VideoUpload />
           </div>
-        )
+        );
+      case "videoUploading":
+        return (
+          <div className="flex-1 overflow-auto p-4 flex justify-center">
+            <UploadProccesing />
+          </div>
+        );
 
       default:
         return <MainContent />; // fallback
@@ -36,7 +40,7 @@ const VideoFlowDashboard = () => {
     <Protect fallback={<Signup />}>
       <div className="flex h-screen bg-gray-50">
         {/* Sidebar */}
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Sidebar/>
 
         {/* Main Content */}
         {renderSection()}

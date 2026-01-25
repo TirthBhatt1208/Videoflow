@@ -137,13 +137,13 @@ export const getStatusBadge = (status: string) => {
   };
 
 export const menuItems = [
-    { id: "dashboard", icon: BarChart3, label: "Dashboard" },
-    { id: "upload", icon: Upload, label: "Upload" },
-    { id: "videos", icon: Film, label: "My Videos" },
-    { id: "analytics", icon: BarChart3, label: "Analytics" },
-    { id: "settings", icon: Settings, label: "Settings" },
-    { id: "profile", icon: User, label: "Profile" },
-  ];
+  { id: "dashboard", icon: BarChart3, label: "Dashboard" },
+  { id: "upload", icon: Upload, label: "Upload" },
+  { id: "videos", icon: Film, label: "My Videos" },
+  { id: "videoUploading", icon: BarChart3, label: "Video Uploading" },
+  { id: "settings", icon: Settings, label: "Settings" },
+  { id: "profile", icon: User, label: "Profile" },
+];
 
 export const uploadFile = [
       {

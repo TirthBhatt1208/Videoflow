@@ -2,13 +2,12 @@ import React from 'react'
 import {
   menuItems,
 } from "../../Data/dashboard.ts";
-import type { SidebarProps } from "../../Types/dashboard.ts";
 import dashboardSection from "../../Store/store.ts";
 
 
 
-function Navbar({activeTab, setActiveTab}: SidebarProps) {
-  const { setid } = dashboardSection();
+function Navbar() {
+  const { setid , setActiveTab , activeTab} = dashboardSection();
 
   const handleClick = (id: string) => {
     setActiveTab(id);

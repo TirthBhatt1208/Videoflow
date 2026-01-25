@@ -8,16 +8,18 @@ import WorkflowSection from "./home/Workflowsection";
 import MainContent from "./dashboard/MainContent";
 import Sidebar from "./dashboard/Sidebar";
 import Inputfile from "./dashboard/Inputfile";
+import UploadProccesing from "./videoUploading/UploadProccesing";
 
 export {
-    CTASection,
-    FeatureSection,
-    Footer,
-    Header,
-    HeroSection,
-    StatsSection,
-    WorkflowSection,
-    MainContent,
-    Sidebar,
-    Inputfile
-}
+  CTASection,
+  FeatureSection,
+  Footer,
+  Header,
+  HeroSection,
+  StatsSection,
+  WorkflowSection,
+  MainContent,
+  Sidebar,
+  Inputfile,
+  UploadProccesing,
+};
