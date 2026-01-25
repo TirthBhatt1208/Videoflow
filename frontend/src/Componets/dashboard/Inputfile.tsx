@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import type { ChangeEvent } from "react";
-import uploadVideos from "../../Api/postApis";
+import uploadVideos from "../../Services/uploadVideos";
 import dashboardSection , {videoUploding} from "../../Store/store"
 
 interface InputFileProps {
@@ -29,10 +29,18 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
       const files = Array.from(fileList);
       console.log("Files are: ", files);
 
-      setid("videoUploading");
-      setActiveTab("videoUploading");
-      setIsUploading()
-      await uploadVideos(files);
+      try {
+
+        setid("videoUploading");
+        setActiveTab("videoUploading");
+        setIsUploading()
+        await uploadVideos(files);
+        setIsUploading()
+        
+      } catch (error) {
+        console.error("Error uploading files:", error);
+        setIsUploading()
+      }
 
     };
 

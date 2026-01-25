@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { Home, Login, Signup, DashBoard } from "./Pages";
 import { ThemeProvider } from "./Context/ThemeProvider";
 import { useAuth } from "@clerk/clerk-react";
-
 function App() {
   const { isSignedIn, isLoaded } = useAuth();
 
