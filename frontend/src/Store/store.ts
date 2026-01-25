@@ -7,10 +7,10 @@ interface DashboardSectionState {
     setid: (newId: string) => void;
 }
 const dashboardSection = create<DashboardSectionState>((set) => ({
-    id: "",
-    activeTab: "",
-    setid: (newId) => set({id: newId}),
-    setActiveTab: (tab) => set({ activeTab: tab }),
+  id: "dashboard",
+  activeTab: "dashboard",
+  setid: (newId) => set({ id: newId }),
+  setActiveTab: (tab) => set({ activeTab: tab }),
 }));
 
 interface VideoUploadingState {
