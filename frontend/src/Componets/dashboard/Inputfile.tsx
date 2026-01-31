@@ -1,7 +1,10 @@
 import React, { forwardRef } from "react";
 import type { ChangeEvent } from "react";
 import uploadVideos from "../../Services/uploadVideos";
-import dashboardSection , {videoUploding} from "../../Store/store"
+import dashboardSection, {
+  videoUploding,
+  uploadVideoProcessing,
+} from "../../Store/store";
 
 interface InputFileProps {
   type: string;
@@ -16,6 +19,7 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
 
     const {setid , setActiveTab} = dashboardSection()
     const {setIsUploading} = videoUploding()
+    const { setStatus , setProgress , setFileName} = uploadVideoProcessing();
     const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
       e.preventDefault();
 
@@ -34,7 +38,8 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
         setid("videoUploading");
         setActiveTab("videoUploading");
         setIsUploading()
-        await uploadVideos(files);
+        setFileName(files[0].name)
+        await uploadVideos(files, setStatus, setProgress, setFileName);
         setIsUploading()
         
       } catch (error) {

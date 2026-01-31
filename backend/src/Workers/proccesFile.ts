@@ -74,6 +74,7 @@ export const processFileWorker = new Worker(
     fs.mkdirSync(outputDir, { recursive: true });
 
     console.log("Generating HLS files...");
+
     await generateProccesFiles(metadata.height, originalUrl, outputDir);
 
     const files = await getFiles(outputDir);
