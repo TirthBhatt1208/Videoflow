@@ -5,21 +5,32 @@ import { ApiError } from "../Utils/apiError.js";
 import { ErrorMessage, ErrorStatus, SuccessMessage } from "../Enums/enums.js";
 import { prisma } from "../db/index.js";
 import { addToProccessFileQueue } from "../Queues/proccesFile.js";
+import { publisher } from "./redisClient.js";
+import { addToThumbnailsQueue } from "../Queues/thumbnails.js";
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
 export const metaDataWorker = new Worker(
   "metadata",
   async (job: Job) => {
-    const { originalUrl, videoId } = job.data;
+    const { originalUrl, videoId, userId , index } = job.data;
 
     if (!originalUrl || !videoId) {
       throw new ApiError(
         ErrorStatus.validationError,
-        ErrorMessage.validationError_422
+        ErrorMessage.validationError_422,
       );
     }
 
+    // await publisher.publish(
+    //     "video-progress",
+    //     JSON.stringify({
+    //       userId: job.data.userId,
+    //       progress: 5,
+    //       status: "METADATA EXTRACTEING....",
+    //       videoId: job.data.socketVideoId,
+    //     }),
+    //   );
     const metaData = await extractMetaData(originalUrl);
 
     const { duration, width, height, fps, codec, audioCodec, bitrate } =
@@ -41,7 +52,7 @@ export const metaDataWorker = new Worker(
     if (!dbMetaData) {
       throw new ApiError(
         ErrorStatus.internalError,
-        ErrorMessage.internalError_500
+        ErrorMessage.internalError_500,
       );
     }
 
@@ -50,7 +61,7 @@ export const metaDataWorker = new Worker(
         videoId: job.data.videoId,
         jobType: "metadata",
         status: "success",
-        message: SuccessMessage.metadataSuccess_200
+        message: SuccessMessage.metadataSuccess_200,
       },
     });
 
@@ -67,10 +78,11 @@ export const metaDataWorker = new Worker(
       },
     });
 
-    await addToProccessFileQueue([{id:videoId , originalUrl}])
+    await addToThumbnailsQueue({id: videoId , originalUrl } , userId , index);
   },
   {
     connection,
-    concurrency: 3,
-  }
+    concurrency: 1,
+    lockDuration: 600000,
+  },
 );

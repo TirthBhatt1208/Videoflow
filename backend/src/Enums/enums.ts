@@ -105,8 +105,8 @@ export enum ErrorStatus {
   hlsGenerationError = 501,
 
   // Storage
-  storageFailed = 500,
-  storageProviderError = 501,
+  storageFailed = 400,
+  storageProviderError = 403,
 
   // Final Video
   videoFailed = 500,
@@ -148,8 +148,8 @@ export const ErrorMessage = {
   hlsGenerationError_501: "Error occurred during HLS file generation.",
 
   // Storage
-  storageFailed_500: "Storage operation failed.",
-  storageProviderError_501: "Storage provider returned an error.",
+  storageFailed_400: "Storage is Full",
+  storageProviderError_403: "Storage Limit will be exceed after upload this video",
 
   // Final Video
   videoFailed_500: "Final video processing failed.",

@@ -9,6 +9,7 @@ import { generateProccesFiles } from "../Ffmpeg/proccesFile";
 import { uploadOnCloudinary } from "../Utils/cloudinary";
 import { ApiError } from "../Utils/apiError";
 import { ErrorMessage, ErrorStatus } from "../Enums/enums";
+import { publisher } from "./redisClient";
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
@@ -54,7 +55,7 @@ export const processFileWorker = new Worker(
     if (!videoId || !originalUrl) {
       throw new ApiError(
         ErrorStatus.validationError,
-        ErrorMessage.validationError_422
+        ErrorMessage.validationError_422,
       );
     }
 
@@ -66,7 +67,7 @@ export const processFileWorker = new Worker(
     if (!metadata?.height) {
       throw new ApiError(
         ErrorStatus.internalError,
-        "Metadata not found or height is missing"
+        "Metadata not found or height is missing",
       );
     }
 
@@ -75,6 +76,15 @@ export const processFileWorker = new Worker(
 
     console.log("Generating HLS files...");
 
+    // await publisher.publish(
+    //     "video-progress",
+    //     JSON.stringify({
+    //       userId: job.data.userId,
+    //       progress: 50,
+    //       status: "GENERATING DEFFRENT QUALITY...",
+    //       videoId: job.data.socketVideoId,
+    //     }),
+    //   );
     await generateProccesFiles(metadata.height, originalUrl, outputDir);
 
     const files = await getFiles(outputDir);
@@ -98,20 +108,18 @@ export const processFileWorker = new Worker(
         absolutePath,
         "raw",
         publicId,
-        ext
+        ext,
       );
 
       if (!upload) {
         throw new ApiError(
           ErrorStatus.uploadFailedOnCloud,
-          `Failed to upload ${relativePath}`
+          `Failed to upload ${relativePath}`,
         );
       }
 
       uploadCount++;
-      console.log(
-        `Uploaded ${uploadCount}/${files.length}: ${relativePath}`
-      );
+      console.log(`Uploaded ${uploadCount}/${files.length}: ${relativePath}`);
 
       if (relativePath.endsWith("master.m3u8")) {
         await prisma.video.update({
@@ -122,7 +130,16 @@ export const processFileWorker = new Worker(
             progress: 90,
           },
         });
-        console.log(" Master playlist stored");
+        console.log("Master playlist stored");
+        // await publisher.publish(
+        //   "video-progress",
+        //   JSON.stringify({
+        //     userId: job.data.userId,
+        //     progress: 90,
+        //     status: "CREATING MASTER FILE...",
+        //     videoId: job.data.socketVideoId,
+        //   }),
+        // );
         continue;
       }
 
@@ -163,7 +180,7 @@ export const processFileWorker = new Worker(
             processedFileId,
             segmentIndex,
             url: upload.secure_url,
-            size: fileSize, 
+            size: fileSize,
             duration: 4.0,
           },
         });
@@ -195,5 +212,5 @@ export const processFileWorker = new Worker(
 
     console.log(`Video processing completed: ${videoId}`);
   },
-  { connection }
+  { connection, concurrency: 1, lockDuration: 600000 },
 );

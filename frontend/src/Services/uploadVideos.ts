@@ -1,13 +1,8 @@
 import uploadVideosApi from "../Api/postApis";
 import { socket } from "../Sockets/sockets";
-//import {socket} from "../Sockets/sockets"
+import { uploadVideoProcessing , /*videoUploding*/ } from "../Store/store";
 
-async function uploadVideos(
-  files: File[],
-  setStatus: (newStatus: string) => void,
-  setProgress: (newProgress: number) => void,
-  setFileName: (newFileName: string) => void,
-) {
+async function uploadVideos(files: File[], userId: string) {
   try {
     const formData = new FormData();
 
@@ -15,32 +10,64 @@ async function uploadVideos(
       formData.append("videos", file);
     });
 
-    
-    //console.log("index: ", files[idx].name);
+    const { updateVideo } = uploadVideoProcessing.getState();
+    let completedVideos = 0;
+    // CONNECT
+    socket.connect();
 
-    console.log("📦 FormData entries:", Array.from(formData.entries()));
+    socket.off("connect");
+    socket.on("connect", () => {
+      socket.emit("register", userId);
+    });
+
+    // SOCKET PROGRESS
+    socket.off("progress");
+    socket.on("progress", (data) => {
+      console.log("Progress data received:", data);
+
+      if (data.videoId === undefined || data.videoId === null) {
+        console.warn("videoId missing, skipping event");
+        return;
+      }
+      updateVideo(data.videoId.toString(), {
+        progress: data.progress,
+        status: data.status,
+      });
+
+      if (data.status.toLowerCase() === "completed") {
+        console.log("Video completed:", data.videoId);
+        completedVideos += 1;
+
+        // If all videos are completed, disconnect the socket
+        if (completedVideos === files.length) {
+          console.log("All videos uploaded, disconnecting socket.");
+          socket.disconnect();
+        }
+      }
+    });
+
     const response = await uploadVideosApi(formData);
-    console.log(response);
-    const data = response.data.data!;
 
-    if (!data) {
-      console.error("Internal server error!!!");
+    if (!response.data.data) {
+      console.error("Upload failed");
+      socket.disconnect();
       return;
     }
 
-    socket.connect()
-    socket.on("connect", () => {
-      let idx = 0;
-      for (const val of data) {
-        const { status, progress } = val;
-        setStatus(status);
-        setProgress(Number(progress));
-        setFileName(files[idx].name);
-        idx++;
-      }
+    // After upload mark all videos UPLOADED 20%
+    files.forEach((_, index) => {
+      updateVideo(index.toString(), {
+        progress: 20,
+        status: "UPLOADED",
+      });
     });
-  } catch (error) {
-    console.error(error);
+
+    socket.on("disconnect", () => {
+      //videoUploding.getState().setIsUploading();
+      console.log("Socket disconnected");
+    });
+  } catch (err) {
+    console.error(err);
   }
 }
 

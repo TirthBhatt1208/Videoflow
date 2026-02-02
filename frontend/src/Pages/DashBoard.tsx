@@ -1,4 +1,4 @@
-import {Sidebar , MainContent , UploadProccesing} from "../Componets/index.ts";
+import { Sidebar, MainContent, UploadProccesing } from "../Componets/index.ts";
 import { Protect } from "@clerk/clerk-react";
 import Signup from "./Signup.tsx";
 import { UserProfile } from "@clerk/clerk-react";
@@ -25,8 +25,26 @@ const VideoFlowDashboard = () => {
         );
       case "videoUploading":
         return (
-          <div className="flex-1 overflow-auto p-4 flex justify-center">
-            <UploadProccesing />
+          <div className="flex-1 overflow-auto p-6 bg-gray-700">
+            <div className="max-w-2xl mx-auto flex flex-col gap-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  Uploading Your Video...
+                </h2>
+                <p className="text-gray-600">
+                  Please do not close this window.
+                </p>
+              </div>
+
+              <UploadProccesing />
+
+              <div className="bg-white rounded-lg shadow p-6">
+                <p className="text-sm text-black font-bold text-center pt-2">
+                  Video processing will begin automatically once the upload is
+                  complete.
+                </p>
+              </div>
+            </div>
           </div>
         );
 
@@ -35,12 +53,11 @@ const VideoFlowDashboard = () => {
     }
   };
 
-
   return (
     <Protect fallback={<Signup />}>
       <div className="flex h-screen bg-gray-50">
         {/* Sidebar */}
-        <Sidebar/>
+        <Sidebar />
 
         {/* Main Content */}
         {renderSection()}

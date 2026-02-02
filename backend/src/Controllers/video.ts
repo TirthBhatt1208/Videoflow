@@ -5,7 +5,6 @@ import { uploadOnCloudinary } from "../Utils/cloudinary.js";
 import { prisma } from "../db/index.js";
 import { ApiResponse } from "../Utils/apiResonse.js";
 import { addToMetaDataQueue } from "../Queues/metaData.js";
-import { addToThumbnailsQueue } from "../Queues/thumbnails.js";
 
 const uploadVideo = asyncHandler(async (req, res) => {
   if (!req.files || Array.isArray(req.files)) {
@@ -21,7 +20,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
   const user = req.user;
   const savedVideos = [];
-
+  console.log("Videos: " , videos)
   for (const video of videos) {
     const response = await uploadOnCloudinary(video.path);
 
@@ -51,8 +50,9 @@ const uploadVideo = asyncHandler(async (req, res) => {
     savedVideos.push(dbVideo);
   }
 
-  await addToMetaDataQueue(savedVideos)
-  await addToThumbnailsQueue(savedVideos)
+  savedVideos.map(async (video , idx) => {
+    await addToMetaDataQueue(video, user.clerkId , idx);
+  })
 
   return res
     .status(SuccessStatus.uploadSuccess)

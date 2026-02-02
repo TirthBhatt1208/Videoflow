@@ -7,11 +7,16 @@ interface VideoJob {
   originalUrl: string;
 }
 
-export const addToThumbnailsQueue = async (videos : VideoJob[]) => {
-    for (const video of videos) {
-        await thumbnailsQueue.add("MakeThumbnails", {
-            videoId: video.id,
-            originalUrl: video.originalUrl,
-        });
-    }
-}
+export const addToThumbnailsQueue = async (
+  video: VideoJob,
+  userId: string,
+  index: number
+) => {
+  await thumbnailsQueue.add("MakeThumbnails", {
+    videoId: video.id,
+    originalUrl: video.originalUrl,
+    userId: userId,
+    index
+  });
+
+};

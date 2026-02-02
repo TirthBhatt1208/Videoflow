@@ -19,7 +19,10 @@ app.use(clerkMiddleware())
 app.use(ensureUser)
 
 
-import userRoutes from "./Routes/video.js";
+import videoRoutes from "./Routes/video.js";
+import dashboardRoutes from "./Routes/dashboard.js"
 
-app.use("/api/videos", userRoutes);
+app.use("/api/videos", videoRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+
 export default app

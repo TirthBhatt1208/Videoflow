@@ -1,10 +1,11 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef} from "react";
 import type { ChangeEvent } from "react";
 import uploadVideos from "../../Services/uploadVideos";
 import dashboardSection, {
   videoUploding,
   uploadVideoProcessing,
 } from "../../Store/store";
+import { useAuth } from "@clerk/clerk-react";
 
 interface InputFileProps {
   type: string;
@@ -19,7 +20,8 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
 
     const {setid , setActiveTab} = dashboardSection()
     const {setIsUploading} = videoUploding()
-    const { setStatus , setProgress , setFileName} = uploadVideoProcessing();
+    const { addVideo } = uploadVideoProcessing();
+    const {userId} = useAuth()
     const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
       e.preventDefault();
 
@@ -33,14 +35,26 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
       const files = Array.from(fileList);
       console.log("Files are: ", files);
 
+      files.forEach((file, index) => {
+        addVideo({
+          id: index.toString(),
+          fileName: file.name,
+          progress: 0,
+          status: "UPLOADING",
+        });
+      });
+
+
       try {
 
         setid("videoUploading");
         setActiveTab("videoUploading");
         setIsUploading()
-        setFileName(files[0].name)
-        await uploadVideos(files, setStatus, setProgress, setFileName);
-        setIsUploading()
+
+        await uploadVideos(
+          files,
+          userId!,
+        );
         
       } catch (error) {
         console.error("Error uploading files:", error);

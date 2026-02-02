@@ -1,13 +1,20 @@
-import {Queue} from "bullmq"
+import { Queue } from "bullmq";
 
-const processFileQueue = new Queue("processfile")
+const processFileQueue = new Queue("processfile");
 
 interface VideoJob {
   id: string;
   originalUrl: string;
 }
-export const addToProccessFileQueue = async (videos: VideoJob[]) => {
-    for(const video of videos){
-        await processFileQueue.add("proccesFiles" , {videoId: video.id , originalUrl: video.originalUrl})
-    }
-}
+export const addToProccessFileQueue = async (
+  video: VideoJob,
+  userId: string,
+  index: number
+) => {
+  await processFileQueue.add("proccesFiles", {
+    videoId: video.id,
+    originalUrl: video.originalUrl,
+    userId: userId,
+    index
+  });
+};
