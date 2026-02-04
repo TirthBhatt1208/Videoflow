@@ -11,6 +11,7 @@ const VideoFlowDashboard = () => {
   const { id } = dashboardSection();
   interface Video {
     masterPlaylistUrl: string;
+    vttUrl: string;
     thumbnail?: { url?: string }[];
   }
   const [videos, setVideos] = useState<Video[]>([]);
@@ -74,6 +75,7 @@ const VideoFlowDashboard = () => {
                 <Videoplayer
                   key={index}
                   url={video.masterPlaylistUrl}
+                  thumbnailVttUrl={video.vttUrl!}
                   poster={video.thumbnail?.[0]?.url}
                 />
               ))}

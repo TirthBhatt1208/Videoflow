@@ -3,10 +3,11 @@ import "plyr-react/plyr.css";
 
 type Props = {
   url: string;
+    thumbnailVttUrl?: string;
   poster?: string;
 };
 
-function Videoplayer({ url, poster }: Props) {
+function Videoplayer({ url, poster, thumbnailVttUrl }: Props) {
   const plyrProps = {
     source: {
       type: "video" as const,
@@ -19,6 +20,10 @@ function Videoplayer({ url, poster }: Props) {
       poster: poster,
     },
     options: {
+      previewThumbnails: {
+        enabled: true,
+        src: thumbnailVttUrl,
+      },
       controls: [
         "play",
         "progress",
