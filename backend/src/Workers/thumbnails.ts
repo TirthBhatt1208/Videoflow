@@ -127,7 +127,7 @@ export const thumbnailsWorker = new Worker(
     }
 
     await addToProccessFileQueue({ id: videoId, originalUrl }, userId, index);
-    await addToVttFileQueue(videoId)
+    await addToVttFileQueue(videoId);
   },
   { connection, concurrency: 1, lockDuration: 600000 },
 );

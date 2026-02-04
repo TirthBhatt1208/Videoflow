@@ -78,6 +78,9 @@ export const generateProccesFiles = async (
       `\nGenerating ${res.name} (v${idx}) - ${res.height}p @ ${res.bitrate}...`,
     );
     execSync(cmd, { stdio: "inherit" });
+    const data = fs.readFileSync(`${variantDir}/index.m3u8`, "utf8");
+    console.log(`\n=== ${res.name} Playlist ===`);
+    console.log(data);
     console.log(`✓ ${res.name} completed`);
   });
 

@@ -64,12 +64,11 @@ const uploadVideo = asyncHandler(async (req, res) => {
       )
     );
 });
+const getCloudUrls = asyncHandler(async (req, res) => {
+  const { id } = req.user;
 
-const getCloudUrls = asyncHandler(async (req , res) => {
-  const {id} = req.user
-
-  if(!id) {
-    throw new ApiError(404 , "Id not found!!")
+  if (!id) {
+    throw new ApiError(404, "Id not found!!");
   }
 
   const videos = await prisma.video.findMany({
@@ -77,11 +76,11 @@ const getCloudUrls = asyncHandler(async (req , res) => {
     where: {
       userId: id,
       vttUrl: {
-        not: null
+        not: null,
       },
       masterPlaylistUrl: {
-        not: null
-      }
+        not: null,
+      },
     },
     select: {
       id: true,
@@ -96,14 +95,16 @@ const getCloudUrls = asyncHandler(async (req , res) => {
     },
   });
 
-  
-  if(!videos) {
-    throw new ApiError(500 , "videos not found due to internal server erorr!")
+  if (!videos) {
+    throw new ApiError(500, "videos not found due to internal server erorr!");
   }
 
-  console.log(" Videos: " , videos)
+  console.log(" Videos: ", videos);
 
-  return res.status(SuccessStatus.ok).json(new ApiResponse(SuccessStatus.ok , {videos} , "Urls Sent succesfully"))
-
-})
+  return res
+    .status(SuccessStatus.ok)
+    .json(
+      new ApiResponse(SuccessStatus.ok, { videos }, "Urls Sent succesfully"),
+    );
+});
 export { uploadVideo, getCloudUrls };

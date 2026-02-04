@@ -9,5 +9,6 @@ export const getStats = async () => {
 export const getCloudUrls = async () => {
   const response = await axios.get("/api/videos/cloudurls");
   console.log("Resoopnse: ", response);
-  return response
+
+  return response;
 };
