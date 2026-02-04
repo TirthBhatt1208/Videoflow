@@ -9,7 +9,6 @@ import Signup from "./Signup.tsx";
 import { UserProfile } from "@clerk/clerk-react";
 import dashboardSection from "../Store/store.ts";
 import VideoUpload from "./VideoUpload.tsx";
-import  Videoplayer  from "../Componets/videoPlayer/videoplayer.tsx";
 import { useEffect, useState } from "react";
 import { getCloudUrls } from "../Api/getApis.ts";
 const VideoFlowDashboard = () => {

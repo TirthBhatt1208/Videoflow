@@ -34,7 +34,7 @@ function Videoplayer({ url, poster, thumbnailVttUrl }: Props) {
       ],
     },
   };
-
+  console.log("Rendering Videoplayer with URL:", url);
   return (
     <div className="w-full aspect-video bg-black rounded-lg overflow-hidden">
       <Plyr {...plyrProps} />
