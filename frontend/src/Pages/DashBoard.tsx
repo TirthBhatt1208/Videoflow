@@ -4,9 +4,28 @@ import Signup from "./Signup.tsx";
 import { UserProfile } from "@clerk/clerk-react";
 import dashboardSection from "../Store/store.ts";
 import VideoUpload from "./VideoUpload.tsx";
+import  Videoplayer  from "../Componets/videoPlayer/videoplayer.tsx";
+import { useEffect, useState } from "react";
+import { getCloudUrls } from "../Api/getApis.ts";
 const VideoFlowDashboard = () => {
   const { id } = dashboardSection();
+  interface Video {
+    masterPlaylistUrl: string;
+    thumbnail?: { url?: string }[];
+  }
+  const [videos, setVideos] = useState<Video[]>([]);
 
+  useEffect(() => {
+   const fetchVideos = async () => {
+     if (id === "videos") {
+       const response = await getCloudUrls();
+       const data = response.data.data.videos;
+       setVideos(data);
+     }
+   };
+
+   fetchVideos();
+  } , [id])
   const renderSection = () => {
     switch (id) {
       case "":
@@ -44,6 +63,20 @@ const VideoFlowDashboard = () => {
                   complete.
                 </p>
               </div>
+            </div>
+          </div>
+        );
+      case "videos":
+        return (
+          <div className="flex-1 overflow-auto p-6 bg-gray-900 text-white">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {videos.map((video, index) => (
+                <Videoplayer
+                  key={index}
+                  url={video.masterPlaylistUrl}
+                  poster={video.thumbnail?.[0]?.url}
+                />
+              ))}
             </div>
           </div>
         );

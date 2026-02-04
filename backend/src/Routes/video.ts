@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { uploadVideo } from "../Controllers/video.js";
+import { getCloudUrls, uploadVideo } from "../Controllers/video.js";
 import {upload} from "../Middlewares/multer.js"
 import { checkStrorage } from "../Middlewares/checkStorage.js";
 
@@ -12,4 +12,5 @@ router
     checkStrorage , uploadVideo,
   );
 
+  router.route("/cloudurls").get(getCloudUrls);
 export default router;

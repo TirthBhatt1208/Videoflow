@@ -64,5 +64,47 @@ const uploadVideo = asyncHandler(async (req, res) => {
       )
     );
 });
+const getCloudUrls = asyncHandler(async (req, res) => {
+  const { id } = req.user;
 
-export { uploadVideo };
+  if (!id) {
+    throw new ApiError(404, "Id not found!!");
+  }
+
+  const videos = await prisma.video.findMany({
+    take: 10,
+    where: {
+      userId: id,
+      vttUrl: {
+        not: null,
+      },
+      masterPlaylistUrl: {
+        not: null,
+      },
+    },
+    select: {
+      id: true,
+      vttUrl: true,
+      masterPlaylistUrl: true,
+      thumbnail: {
+        take: 1,
+        select: {
+          url: true,
+        },
+      },
+    },
+  });
+
+  if (!videos) {
+    throw new ApiError(500, "videos not found due to internal server erorr!");
+  }
+
+  console.log(" Videos: ", videos);
+
+  return res
+    .status(SuccessStatus.ok)
+    .json(
+      new ApiResponse(SuccessStatus.ok, { videos }, "Urls Sent succesfully"),
+    );
+});
+export { uploadVideo, getCloudUrls };

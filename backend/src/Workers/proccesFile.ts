@@ -9,10 +9,60 @@ import { generateProccesFiles } from "../Ffmpeg/proccesFile";
 import { uploadOnCloudinary } from "../Utils/cloudinary";
 import { ApiError } from "../Utils/apiError";
 import { ErrorMessage, ErrorStatus } from "../Enums/enums";
-import { publisher } from "./redisClient";
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
+/* ---------------- PLAYLIST REWRITE HELPERS ---------------- */
+
+function rewriteIndexPlaylist(
+  indexPath: string,
+  segmentMap: Map<string, string>,
+) {
+  let lines = fs.readFileSync(indexPath, "utf8").split("\n");
+
+  lines = lines.map((line) => {
+    const trimmed = line.trim();
+
+    // sirf segment lines replace karo
+    if (trimmed.endsWith(".ts")) {
+      for (const [localAbsPath, cloudUrl] of segmentMap.entries()) {
+        const fileName = path.basename(localAbsPath);
+
+        if (trimmed === fileName) {
+          return cloudUrl;
+        }
+      }
+    }
+
+    return line;
+  });
+
+  fs.writeFileSync(indexPath, lines.join("\n"));
+}
+
+
+function rewriteMasterPlaylist(
+  masterPath: string,
+  indexMap: Map<string, string>,
+) {
+  let lines = fs.readFileSync(masterPath, "utf8").split("\n");
+
+  lines = lines.map((line) => {
+    const trimmed = line.trim();
+
+    if (trimmed.endsWith(".m3u8")) {
+      const cloudUrl = indexMap.get(trimmed);
+      if (cloudUrl) return cloudUrl;
+    }
+
+    return line;
+  });
+
+  fs.writeFileSync(masterPath, lines.join("\n"));
+}
+
+
+/* ---------------- FILE COLLECTOR ---------------- */
 
 async function getFiles(outputDir: string): Promise<string[]> {
   const patterns = [
@@ -20,44 +70,24 @@ async function getFiles(outputDir: string): Promise<string[]> {
     `${outputDir}/v*/index.m3u8`,
     `${outputDir}/v*/*.ts`,
   ];
-
   const matches = await Promise.all(patterns.map((p) => glob(p)));
   return matches.flat().sort();
 }
 
-const VARIANT_TO_RESOLUTION: Record<string, string> = {
-  v0: "240p",
-  v1: "360p",
-  v2: "480p",
-  v3: "720p",
-  v4: "1080p",
-};
-
-function extractVariant(file: string): string {
-  const match = file.match(/\/(v\d+)\//);
-  if (!match) throw new Error(`Variant not found in ${file}`);
-  return match[1]!;
-}
-
-function extractSegmentIndex(file: string): number {
-  const match = file.match(/segment_(\d+)\.ts$/);
-  if (!match) throw new Error(`Segment index not found in ${file}`);
-  return Number(match[1]);
-}
-
+/* ---------------- WORKER ---------------- */
 
 export const processFileWorker = new Worker(
   "processfile",
   async (job: Job) => {
     const { videoId, originalUrl } = job.data;
-    console.log(`Processing video: ${videoId}`);
-
     if (!videoId || !originalUrl) {
       throw new ApiError(
         ErrorStatus.validationError,
         ErrorMessage.validationError_422,
       );
     }
+
+    console.log(`Processing video: ${videoId}`);
 
     const metadata = await prisma.metadata.findUnique({
       where: { videoId },
@@ -67,150 +97,113 @@ export const processFileWorker = new Worker(
     if (!metadata?.height) {
       throw new ApiError(
         ErrorStatus.internalError,
-        "Metadata not found or height is missing",
+        "Metadata not found or height missing",
       );
     }
 
     const outputDir = path.join(process.cwd(), "public", "processed", videoId);
     fs.mkdirSync(outputDir, { recursive: true });
 
-    console.log("Generating HLS files...");
-
-    // await publisher.publish(
-    //     "video-progress",
-    //     JSON.stringify({
-    //       userId: job.data.userId,
-    //       progress: 50,
-    //       status: "GENERATING DEFFRENT QUALITY...",
-    //       videoId: job.data.socketVideoId,
-    //     }),
-    //   );
+    /* -------- GENERATE HLS -------- */
     await generateProccesFiles(metadata.height, originalUrl, outputDir);
 
     const files = await getFiles(outputDir);
-    console.log(`Found ${files.length} files to upload`);
 
-    const processedFileMap = new Map<string, string>();
+    const segmentUrlMap = new Map<string, string>();
+    const indexUrlMap = new Map<string, string>();
 
-    let uploadCount = 0;
-    for (const absolutePath of files) {
-      const normalized = absolutePath.replace(/\\/g, "/");
+    /* =====================================================
+       PASS 1 — UPLOAD ONLY TS FILES
+    ====================================================== */
+    for (const abs of files) {
+      if (!abs.endsWith(".ts")) continue;
+
+      const normalized = abs.replace(/\\/g, "/");
       const relativePath = normalized.replace("public/", "");
-      const ext = path.extname(relativePath).slice(1) as "m3u8" | "ts";
-      const publicId = relativePath.replace(`.${ext}`, "");
 
-      const fileSize = fs.existsSync(absolutePath)
-        ? fs.statSync(absolutePath).size
-        : 0;
-
-      console.log(`Uploading ${relativePath}...`);
       const upload = await uploadOnCloudinary(
-        absolutePath,
+        abs,
         "raw",
-        publicId,
-        ext,
+        relativePath.replace(".ts", ""),
+        "ts",
       );
 
-      if (!upload) {
-        throw new ApiError(
-          ErrorStatus.uploadFailedOnCloud,
-          `Failed to upload ${relativePath}`,
-        );
-      }
+      if (!upload) throw new Error("TS Upload Failed");
 
-      uploadCount++;
-      console.log(`Uploaded ${uploadCount}/${files.length}: ${relativePath}`);
-
-      if (relativePath.endsWith("master.m3u8")) {
-        await prisma.video.update({
-          where: { id: videoId },
-          data: {
-            masterPlaylistUrl: upload.secure_url,
-            status: "HLS_READY",
-            progress: 90,
-          },
-        });
-        console.log("Master playlist stored");
-        // await publisher.publish(
-        //   "video-progress",
-        //   JSON.stringify({
-        //     userId: job.data.userId,
-        //     progress: 90,
-        //     status: "CREATING MASTER FILE...",
-        //     videoId: job.data.socketVideoId,
-        //   }),
-        // );
-        continue;
-      }
-
-      if (relativePath.endsWith("index.m3u8")) {
-        const variant = extractVariant(relativePath);
-
-        const processedFile = await prisma.processedFile.upsert({
-          where: {
-            videoId_variant: { videoId, variant },
-          },
-          update: {
-            indexPlaylistUrl: upload.secure_url,
-          },
-          create: {
-            videoId,
-            variant,
-            resolution: VARIANT_TO_RESOLUTION[variant]!,
-            indexPlaylistUrl: upload.secure_url,
-          },
-        });
-
-        processedFileMap.set(variant, processedFile.id);
-        console.log(`${variant} playlist stored`);
-        continue;
-      }
-
-      if (relativePath.endsWith(".ts")) {
-        const variant = extractVariant(relativePath);
-        const segmentIndex = extractSegmentIndex(relativePath);
-
-        const processedFileId = processedFileMap.get(variant);
-        if (!processedFileId) {
-          throw new Error(`ProcessedFile missing for ${variant}`);
-        }
-
-        await prisma.segment.create({
-          data: {
-            processedFileId,
-            segmentIndex,
-            url: upload.secure_url,
-            size: fileSize,
-            duration: 4.0,
-          },
-        });
-      }
+      segmentUrlMap.set(abs, upload.secure_url);
+      console.log("TS Uploaded:", relativePath);
     }
+
+    /* =====================================================
+       PASS 2 — REWRITE INDEX PLAYLISTS
+    ====================================================== */
+    const indexFiles = files.filter((f) => f.endsWith("index.m3u8"));
+
+    for (const indexPath of indexFiles) {
+      rewriteIndexPlaylist(indexPath, segmentUrlMap);
+    }
+
+    /* =====================================================
+       PASS 3 — UPLOAD INDEX PLAYLISTS
+    ====================================================== */
+    for (const indexPath of indexFiles) {
+      const normalized = indexPath.replace(/\\/g, "/");
+      const relativePath = normalized.replace("public/", "");
+
+      const upload = await uploadOnCloudinary(
+        indexPath,
+        "raw",
+        relativePath.replace(".m3u8", ""),
+        "m3u8",
+      );
+
+      if (!upload) throw new Error("Index Upload Failed");
+
+      // store for master rewrite
+      const shortPath = relativePath.replace(`processed/${videoId}/`, "");
+      indexUrlMap.set(shortPath, upload.secure_url);
+
+      console.log("Index Uploaded:", shortPath);
+    }
+
+    /* =====================================================
+       PASS 4 — REWRITE MASTER
+    ====================================================== */
+    const masterPath = path.join(outputDir, "master.m3u8");
+    rewriteMasterPlaylist(masterPath, indexUrlMap);
+
+    /* =====================================================
+       PASS 5 — UPLOAD MASTER
+    ====================================================== */
+    const masterUpload = await uploadOnCloudinary(
+      masterPath,
+      "raw",
+      `processed/${videoId}/master`,
+      "m3u8",
+    );
+
+    if (!masterUpload) throw new Error("Master Upload Failed");
 
     await prisma.video.update({
       where: { id: videoId },
       data: {
+        masterPlaylistUrl: masterUpload.secure_url,
         status: "COMPLETED",
         progress: 100,
       },
     });
 
-    await prisma.jobLog.create({
-      data: {
-        videoId,
-        jobType: "processFile",
-        status: "success",
-        message: `Successfully processed ${files.length} files`,
-      },
-    });
+    console.log("Master Uploaded");
 
-    console.log("Cleaning up local files...");
+    /* =====================================================
+       CLEANUP LOCAL FILES
+    ====================================================== */
     fs.rmSync(path.join(process.cwd(), "public", "processed"), {
       recursive: true,
       force: true,
     });
 
-    console.log(`Video processing completed: ${videoId}`);
+    console.log(`Processing complete for ${videoId}`);
   },
   { connection, concurrency: 1, lockDuration: 600000 },
 );
