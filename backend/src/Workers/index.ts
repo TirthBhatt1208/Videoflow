@@ -1,6 +1,7 @@
 import { metaDataWorker } from "./metaData";
 import { thumbnailsWorker } from "./thumbnails";
 import {processFileWorker} from "./proccesFile"
+import {vttFileWorker} from "./vttFile"
 import dotenv from "dotenv";
 import { publisher } from "./redisClient";
 dotenv.config();

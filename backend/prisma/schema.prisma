@@ -26,6 +26,7 @@ model Video {
 
   originalUrl           String
   masterPlaylistUrl     String? 
+  vttUrl               String?
   title                 String?
   description           String?
   
@@ -45,6 +46,7 @@ enum VideoStatus {
   QUEUED
   METADATA_EXTRACTED
   TRANSCODED
+  VTTGENERATED
   HLS_READY
   COMPLETED
   FAILED

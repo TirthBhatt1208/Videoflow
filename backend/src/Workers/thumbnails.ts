@@ -9,6 +9,7 @@ import { uploadOnCloudinary } from "../Utils/cloudinary.js";
 import { prisma } from "../db/index.js";
 import { publisher } from "./redisClient.js";
 import { addToProccessFileQueue } from "../Queues/proccesFile.js";
+import { addToVttFileQueue } from "../Queues/vttFile.js";
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
@@ -126,6 +127,7 @@ export const thumbnailsWorker = new Worker(
     }
 
     await addToProccessFileQueue({ id: videoId, originalUrl }, userId, index);
+    await addToVttFileQueue(videoId)
   },
   { connection, concurrency: 1, lockDuration: 600000 },
 );

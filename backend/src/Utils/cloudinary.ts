@@ -11,36 +11,58 @@ type options = {
   resource_type: "image" | "video" | "raw";
   public_id?: string;
   format?: string;
+  overwrite?: boolean;
+  invalidate?: boolean;
+  access_mode?: string; 
 };
 
-export const uploadOnCloudinary = async (localFilePath : string , type: "image" | "video" | "raw" = "video" , public_id?: string , format?: "m3u8" | "ts") => {
+export const uploadOnCloudinary = async (
+  localFilePath: string,
+  type: "image" | "video" | "raw" = "video",
+  public_id?: string,
+  format?: "m3u8" | "ts",
+) => {
   try {
     if (!localFilePath) return null;
     const normalized = localFilePath.replace(/\\/g, "/");
 
-    //upload the file on cloudinary
-    console.log("Local file path: " , localFilePath);
-    
+    console.log("📤 Uploading:", localFilePath);
+    if (public_id) console.log("📍 Public ID:", public_id);
+
+    let resourceType = type;
+    if (format === "m3u8" || localFilePath.endsWith(".m3u8")) {
+      resourceType = "raw";
+      console.log("🔄 Detected M3U8 file, using resource_type: 'raw'");
+    }
+
     const options: options = {
-      resource_type: `${type}`
+      resource_type: resourceType, 
+      overwrite: true,
+      invalidate: true,
     };
 
-    if(public_id && format) {
-      options.public_id = public_id
-      options.format = format
+    if (public_id) {
+      options.public_id = public_id;
+    }
+
+    if (format && resourceType === "raw") {
+      options.format = format;
+      options.access_mode = "public";
     }
 
     const response = await cloudinary.uploader.upload(normalized, options);
-    // file has been uploaded successfull
-    //console.log("file is uploaded on cloudinary ", response.url);
 
-    console.log("file is uploaded on cloudinary" , localFilePath);
+    console.log("✅ Uploaded:", localFilePath);
+    console.log("   URL:", response.secure_url);
+    console.log("   Public ID:", response.public_id);
+
     fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {
-
-    fs.unlinkSync(localFilePath);
+    console.error("❌ Upload failed:", error);
+    if (fs.existsSync(localFilePath)) {
+      fs.unlinkSync(localFilePath);
+    }
     return null;
-
   }
 };
