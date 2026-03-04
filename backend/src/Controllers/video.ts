@@ -20,7 +20,7 @@ const uploadVideo = asyncHandler(async (req, res) => {
 
   const user = req.user;
   const savedVideos = [];
-  console.log("Videos: " , videos)
+  console.log("Videos: ", videos)
   for (const video of videos) {
     const response = await uploadOnCloudinary(video.path);
 
@@ -35,11 +35,11 @@ const uploadVideo = asyncHandler(async (req, res) => {
       data: {
         userId: user.id,
         originalUrl: response.url,
-        title: title || "",
+        title: title || video.originalname || "",
         description: description || "",
       },
     });
-    
+
     if (!dbVideo) {
       throw new ApiError(
         ErrorStatus.uploadFailed,
@@ -50,8 +50,8 @@ const uploadVideo = asyncHandler(async (req, res) => {
     savedVideos.push(dbVideo);
   }
 
-  savedVideos.map(async (video , idx) => {
-    await addToMetaDataQueue(video, user.clerkId , idx);
+  savedVideos.map(async (video, idx) => {
+    await addToMetaDataQueue(video, user.clerkId, idx);
   })
 
   return res
@@ -107,4 +107,69 @@ const getCloudUrls = asyncHandler(async (req, res) => {
       new ApiResponse(SuccessStatus.ok, { videos }, "Urls Sent succesfully"),
     );
 });
-export { uploadVideo, getCloudUrls };
+
+const getAllCompletedVideos = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const skip = (page - 1) * limit;
+
+  const [videos, totalCount] = await Promise.all([
+    prisma.video.findMany({
+      skip,
+      take: limit,
+      where: {
+        status: "COMPLETED",
+        masterPlaylistUrl: { not: null },
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        vttUrl: true,
+        masterPlaylistUrl: true,
+        createdAt: true,
+        thumbnail: {
+          take: 1,
+          select: {
+            url: true,
+          },
+        },
+        metadata: {
+          select: {
+            duration: true,
+          },
+        },
+      },
+    }),
+    prisma.video.count({
+      where: {
+        status: "COMPLETED",
+        masterPlaylistUrl: { not: null },
+      },
+    }),
+  ]);
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return res
+    .status(SuccessStatus.ok)
+    .json(
+      new ApiResponse(
+        SuccessStatus.ok,
+        {
+          videos,
+          pagination: {
+            page,
+            limit,
+            totalCount,
+            totalPages,
+            hasNext: page < totalPages,
+            hasPrev: page > 1,
+          },
+        },
+        "All completed videos fetched successfully",
+      ),
+    );
+});
+
+export { uploadVideo, getCloudUrls, getAllCompletedVideos };

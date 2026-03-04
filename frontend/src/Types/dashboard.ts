@@ -1,20 +1,32 @@
+export type VideoStatusType =
+  | "UPLOADED"
+  | "QUEUED"
+  | "METADATA_EXTRACTED"
+  | "VTT_GENERATED"
+  | "TRANSCODED"
+  | "VTTGENERATED"
+  | "HLS_READY"
+  | "COMPLETED"
+  | "FAILED";
+
 export interface VideoItem {
   id: string;
   name: string;
   size: string;
   format: string;
   duration: string;
-  status: "processing" | "completed" | "failed";
+  status: VideoStatusType;
+  progress: number;
   uploadedAt: string;
-  thumbnail: string;
+  createdAt: string;
 }
 
 export interface ProcessingJob {
   id: string;
-  name: string;
+  fileName: string;
   progress: number;
-  timeRemaining: string;
-  status: "rendering" | "compressing" | "queued";
+  status: VideoStatusType;
+  createdAt: string;
 }
 
 export interface SidebarProps {

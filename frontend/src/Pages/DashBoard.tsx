@@ -11,6 +11,8 @@ import dashboardSection from "../Store/store.ts";
 import VideoUpload from "./VideoUpload.tsx";
 import { useEffect, useState } from "react";
 import { getCloudUrls } from "../Api/getApis.ts";
+import AllVideos from "../Componets/AllVideos/AllVideos.tsx";
+
 const VideoFlowDashboard = () => {
   const { id } = dashboardSection();
   interface Video {
@@ -21,16 +23,16 @@ const VideoFlowDashboard = () => {
   const [videos, setVideos] = useState<Video[]>([]);
 
   useEffect(() => {
-   const fetchVideos = async () => {
-     if (id === "videos") {
-       const response = await getCloudUrls();
-       const data = response.data.data.videos;
-       setVideos(data);
-     }
-   };
+    const fetchVideos = async () => {
+      if (id === "videos") {
+        const response = await getCloudUrls();
+        const data = response.data.data.videos;
+        setVideos(data);
+      }
+    };
 
-   fetchVideos();
-  } , [id])
+    fetchVideos();
+  }, [id])
   const renderSection = () => {
     switch (id) {
       case "":
@@ -86,6 +88,8 @@ const VideoFlowDashboard = () => {
             </div>
           </div>
         );
+      case "allVideos":
+        return <AllVideos />;
 
       default:
         return <MainContent />; // fallback
@@ -106,3 +110,4 @@ const VideoFlowDashboard = () => {
 };
 
 export default VideoFlowDashboard;
+

@@ -12,3 +12,18 @@ export const getCloudUrls = async () => {
 
   return response;
 };
+
+export const getRecentActivity = async () => {
+  const response = await axios.get("/api/dashboard/recent");
+  return response;
+};
+
+export const getProcessingQueue = async () => {
+  const response = await axios.get("/api/dashboard/processing");
+  return response;
+};
+
+export const getAllCompletedVideos = async (page: number = 1, limit: number = 10) => {
+  const response = await axios.get(`/api/videos/all-completed?page=${page}&limit=${limit}`);
+  return response;
+};
