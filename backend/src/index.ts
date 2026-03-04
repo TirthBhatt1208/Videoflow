@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 import { subscriber } from "./Workers/redisClient.js";
 
 
-const Port: number | string = process.env.PORT || 3000;
+const Port: number | string = process.env.PORT || 8000;
 
 const server = http.createServer(app)
 
