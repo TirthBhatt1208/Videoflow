@@ -41,8 +41,8 @@ function Header() {
             />
           </button>
           <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer">
-            {user?.firstName?.charAt(0).toUpperCase()}
-            {user?.lastName?.charAt(0).toUpperCase()}
+            {user?.imageUrl ? (
+              <img src={user.imageUrl} alt={user!.firstName!} className="rounded-full" />) : (user!.firstName!.charAt(0).toUpperCase() + user?.lastName!.charAt(0).toUpperCase())}
           </div>
         </div>
       </div>

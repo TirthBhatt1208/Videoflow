@@ -1,10 +1,13 @@
 import React from 'react'
-import {
-  processingJobs,
-} from "../../Data/dashboard.ts";
+// `import {
+//   processingJobs,
+// } from "../../Data/dashboard.ts";`
+import {uploadVideoProcessing} from "../../Store/store.ts"
 import { X } from "lucide-react";
 
 function ProcessingQueue() {
+  const { videos } = uploadVideoProcessing();
+  console.log("Current processing videos:", videos);
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100">
       <div className="p-6 border-b border-gray-100">
@@ -17,11 +20,11 @@ function ProcessingQueue() {
       </div>
       <div className="p-6">
         <div className="space-y-4">
-          {processingJobs.map((job) => (
+          {videos.map((job) => (
             <div key={job.id} className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-900 truncate">
-                  {job.name}
+                  {job.fileName}
                 </span>
                 <button className="text-gray-400 hover:text-gray-600">
                   <X className="w-4 h-4" />
@@ -37,7 +40,6 @@ function ProcessingQueue() {
                 <span className="text-gray-500 capitalize">
                   {job.status}...
                 </span>
-                <span className="text-gray-500">{job.timeRemaining}</span>
               </div>
             </div>
           ))}
