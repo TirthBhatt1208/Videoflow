@@ -28,11 +28,6 @@ export default defineConfig({
           });
         },
       },
-      "/socket.io": {
-        target: "http://backend:8000",
-        ws: true, // ← WebSocket ke liye zaroori!
-        changeOrigin: true,
-      },
     },
   },
 });

@@ -39,7 +39,7 @@ function Videoplayer({ url, poster, thumbnailVttUrl }: Props) {
         "fullscreen",
       ],
       settings: ["captions", "quality", "speed"],
-      speed: { default: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
+      speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 2] },
       storage: { enabled: true, key: "plyr" },
     },
   };
@@ -52,6 +52,7 @@ function Videoplayer({ url, poster, thumbnailVttUrl }: Props) {
       const hls = new Hls({
         debug: false,
         enableWorker: true,
+        startLevel: -1, // Start in Auto mode — let ABR pick based on network speed
       });
 
       hlsRef.current = hls;
@@ -61,28 +62,54 @@ function Videoplayer({ url, poster, thumbnailVttUrl }: Props) {
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         console.log("Available levels:", hls.levels);
 
-        // Create quality options
+        // Extract available quality heights and prepend 0 (Auto)
         const qualityLevels = hls.levels.map((level) => level.height);
+        const qualityOptions = [0, ...qualityLevels]; // 0 = Auto
 
-        // Update Plyr quality options
-        if (plyrRef.current?.plyr) {
-          plyrRef.current.plyr.quality.options = qualityLevels;
-          console.log("Quality options added:", qualityLevels);
+        // Update Plyr quality options with Auto included
+        const plyr = plyrRef.current?.plyr;
+        if (plyr) {
+          plyr.quality = {
+            default: 0, // Default to Auto
+            options: qualityOptions,
+            forced: true,
+            onChange: (quality: number) => {
+              if (quality === 0) {
+                // Auto mode — let HLS.js decide based on network speed
+                hls.currentLevel = -1;
+                console.log("Quality set to Auto (ABR)");
+              } else {
+                // Find the HLS level matching the selected height
+                const levelIndex = hls.levels.findIndex(
+                  (level) => level.height === quality
+                );
+                if (levelIndex !== -1) {
+                  hls.currentLevel = levelIndex;
+                  console.log(`Quality forced to ${quality}p (level ${levelIndex})`);
+                }
+              }
+            },
+          };
+
+          // Override the quality label so "0" shows as "Auto"
+          plyr.i18n = {
+            ...plyr.i18n,
+            qualityLabel: {
+              0: "Auto",
+            },
+          };
+
+          console.log("Quality options added:", qualityOptions);
         }
       });
 
-      // Handle quality change
-      plyrRef.current.plyr.on("qualitychange", () => {
-        console.log("Quality changed");
-      });
-
-      hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+      hls.on(Hls.Events.LEVEL_SWITCHED, (_event, data) => {
         const level = hls.levels[data.level];
-        console.log(`Switched to: ${level.height}p`);
+        console.log(`ABR switched to: ${level.height}p`);
       });
 
       // Error handling
-      hls.on(Hls.Events.ERROR, (event, data) => {
+      hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
