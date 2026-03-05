@@ -1,7 +1,7 @@
 import React from 'react'
-import {dashBoardStats} from "../../Store/store"
+import { dashBoardStats } from "../../Store/store"
 function Storage() {
-  const {UsedStorage}  = dashBoardStats()
+  const { UsedStorage } = dashBoardStats()
   return (
     <div className="p-4 m-4 bg-slate-800 rounded-lg">
       <div className="flex justify-between items-center mb-2">

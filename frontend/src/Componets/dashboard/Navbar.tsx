@@ -7,7 +7,7 @@ import dashboardSection from "../../Store/store.ts";
 
 
 function Navbar() {
-  const { setid , setActiveTab , activeTab} = dashboardSection();
+  const { setid, setActiveTab, activeTab } = dashboardSection();
 
   const handleClick = (id: string) => {
     setActiveTab(id);
@@ -21,11 +21,10 @@ function Navbar() {
           <button
             key={item.id}
             onClick={() => handleClick((item.id))}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all ${
-              activeTab === item.id
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all ${activeTab === item.id
                 ? "bg-blue-600 text-white"
                 : "text-gray-300 hover:bg-slate-800"
-            }`}
+              }`}
           >
             <Icon className="w-5 h-5" />
             <span className="text-sm font-medium">{item.label}</span>

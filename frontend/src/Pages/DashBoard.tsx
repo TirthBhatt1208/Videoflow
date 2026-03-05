@@ -96,11 +96,33 @@ const VideoFlowDashboard = () => {
     }
   };
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <Protect fallback={<Signup />}>
       <div className="flex h-screen bg-gray-50">
-        {/* Sidebar */}
-        <Sidebar />
+        {/* Mobile hamburger button */}
+        <button
+          className="sidebar-toggle-btn"
+          onClick={() => setSidebarOpen(true)}
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+
+        {/* Sidebar with mobile overlay wrapper */}
+        <div className={`sidebar-wrapper ${sidebarOpen ? "sidebar-open" : ""}`}>
+          {/* Overlay backdrop */}
+          <div
+            className="sidebar-overlay"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div onClick={(e) => {
+            if ((e.target as HTMLElement).closest("button")) setSidebarOpen(false);
+          }}>
+            <Sidebar />
+          </div>
+        </div>
 
         {/* Main Content */}
         {renderSection()}

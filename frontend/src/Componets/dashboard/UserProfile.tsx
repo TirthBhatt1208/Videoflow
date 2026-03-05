@@ -1,7 +1,7 @@
 import React from 'react'
 import { useUser } from '@clerk/clerk-react';
 function UserProfile() {
-  const {user} = useUser();
+  const { user } = useUser();
   return (
     <div className="px-4 py-3 mx-4 mb-4 bg-slate-800 rounded-lg flex items-center gap-3">
       <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-sm font-semibold">

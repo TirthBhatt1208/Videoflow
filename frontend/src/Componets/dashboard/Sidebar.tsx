@@ -13,7 +13,7 @@ function Sidebar() {
       <UserProfile />
 
       {/* Navigation */}
-      <Navbar/>
+      <Navbar />
 
       {/* Storage */}
       <Storage />

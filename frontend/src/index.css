@@ -5,6 +5,223 @@
     background-position: center !important;
 }
 
+/* ===== Video Player Responsive ===== */
+/* Force Plyr to fill its container — critical for responsive video playback */
+.plyr,
+.plyr__video-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.plyr--video {
+    width: 100% !important;
+}
+
+.plyr video {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+}
+
+/* Prevent horizontal overflow on all screen sizes */
+html,
+body {
+    overflow-x: hidden;
+}
+
+/* ===== Sidebar Toggle System ===== */
+
+/* Hamburger button: hidden on desktop */
+.sidebar-toggle-btn {
+    display: none;
+}
+
+/* Sidebar wrapper: on desktop, just pass through height */
+.sidebar-wrapper {
+    display: contents;
+}
+
+/* Overlay: hidden on desktop */
+.sidebar-overlay {
+    display: none;
+}
+
+/* Ensure full height cascades to sidebar on desktop */
+.sidebar-wrapper>div:last-child {
+    height: 100%;
+}
+
+.sidebar-wrapper .w-64 {
+    min-height: 100vh;
+}
+
+/* ===== Mobile: up to 767px ===== */
+@media (max-width: 767px) {
+
+    /* Show the hamburger button on mobile */
+    .sidebar-toggle-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 60;
+        width: 2.75rem;
+        height: 2.75rem;
+        background: #0f172a;
+        color: white;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1.4rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        transition: background 0.2s;
+    }
+
+    .sidebar-toggle-btn:hover {
+        background: #1e293b;
+    }
+
+    /* Sidebar wrapper: fixed overlay container, off-screen by default */
+    .sidebar-wrapper {
+        display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 50;
+        pointer-events: none;
+    }
+
+    /* When open, allow clicks */
+    .sidebar-wrapper.sidebar-open {
+        pointer-events: auto;
+    }
+
+    /* Dark overlay backdrop */
+    .sidebar-overlay {
+        display: block !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-wrapper.sidebar-open .sidebar-overlay {
+        opacity: 1;
+    }
+
+    /* Sidebar itself: slide in from left */
+    .sidebar-wrapper .w-64 {
+        display: flex !important;
+        flex-direction: column;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 16rem !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 51;
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .sidebar-wrapper.sidebar-open .w-64 {
+        transform: translateX(0);
+    }
+
+    /* Intermediate wrapper div needs full height for sidebar positioning */
+    .sidebar-wrapper>div:last-child {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 51;
+    }
+
+    /* Reduce main content padding */
+    .p-8 {
+        padding: 1rem !important;
+    }
+
+    /* Dashboard header: stack search bar + action buttons vertically */
+    header .flex.items-center.justify-between {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        align-items: stretch !important;
+    }
+
+    /* Let search bar take full width on mobile */
+    .max-w-xl {
+        max-width: 100% !important;
+    }
+
+    /* Welcome heading: reduce size on mobile */
+    h1.text-3xl {
+        font-size: 1.5rem !important;
+    }
+
+    /* Recent Activity rows: hide duration & time columns on mobile */
+    .flex.items-center.gap-4>.w-20.text-center {
+        display: none !important;
+    }
+
+    .flex.items-center.gap-4>.w-24.text-right {
+        display: none !important;
+    }
+
+    /* Recent Activity: shrink thumbnail */
+    .w-20.h-14 {
+        width: 3rem !important;
+        height: 2.25rem !important;
+        min-width: 3rem !important;
+    }
+
+    /* Hero floating badges: hide on mobile to prevent overflow */
+    .absolute.-right-8 {
+        display: none !important;
+    }
+
+    .absolute.-left-8 {
+        display: none !important;
+    }
+
+    /* DropZone: reduce padding on mobile */
+    .p-16 {
+        padding: 2rem !important;
+    }
+
+    /* Video uploading section: reduce max-width constraint */
+    .max-w-2xl {
+        max-width: 100% !important;
+    }
+}
+
+/* ===== Tablet: 768px to 1023px ===== */
+@media (min-width: 768px) and (max-width: 1023px) {
+
+    /* Narrow the sidebar slightly */
+    .w-64 {
+        width: 13rem !important;
+    }
+
+    /* Reduce main padding */
+    .p-8 {
+        padding: 1.25rem !important;
+    }
+
+    /* Recent Activity: hide time column on tablet */
+    .flex.items-center.gap-4>.w-24.text-right {
+        display: none !important;
+    }
+}
+
 @keyframes shimmer {
     0% {
         transform: translateX(-100%);

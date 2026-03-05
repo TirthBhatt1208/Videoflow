@@ -49,7 +49,6 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
 
         setid("videoUploading");
         setActiveTab("videoUploading");
-        setIsUploading()
 
         await uploadVideos(
           files,

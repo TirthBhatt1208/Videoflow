@@ -1,6 +1,6 @@
 import uploadVideosApi from "../Api/postApis";
 import { socket } from "../Sockets/sockets";
-import { uploadVideoProcessing , /*videoUploding*/ } from "../Store/store";
+import { uploadVideoProcessing , videoUploding } from "../Store/store";
 
 async function uploadVideos(files: File[], userId: string) {
   try {
@@ -18,6 +18,7 @@ async function uploadVideos(files: File[], userId: string) {
     socket.off("connect");
     socket.on("connect", () => {
       socket.emit("register", userId);
+      videoUploding.getState().setIsUploading();
     });
 
     // SOCKET PROGRESS
@@ -63,7 +64,7 @@ async function uploadVideos(files: File[], userId: string) {
     });
 
     socket.on("disconnect", () => {
-      //videoUploding.getState().setIsUploading();
+      videoUploding.getState().setIsUploading();
       console.log("Socket disconnected");
     });
   } catch (err) {
