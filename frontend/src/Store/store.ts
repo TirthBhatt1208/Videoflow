@@ -32,21 +32,26 @@ interface VideoItem {
 }
 interface uploadVideoProcessingState {
   videos: VideoItem[];
+  nextVideoId: number;
 
   addVideo: (video: VideoItem) => void;
   updateVideo: (id: string, data: Partial<VideoItem>) => void;
 
   removeVideo: (id: string) => void;
   clearVideos: () => void;
+  getNextVideoId: () => number;
+  resetVideoIdCounter: () => void;
 }
 
 
-const uploadVideoProcessing = create<uploadVideoProcessingState>((set) => ({
+const uploadVideoProcessing = create<uploadVideoProcessingState>((set, get) => ({
   videos: [],
+  nextVideoId: 0,
 
   addVideo: (video) =>
     set((state) => ({
       videos: [...state.videos, video],
+      nextVideoId: state.nextVideoId + 1,
     })),
 
   updateVideo: (id, data) =>
@@ -59,7 +64,11 @@ const uploadVideoProcessing = create<uploadVideoProcessingState>((set) => ({
       videos: state.videos.filter((v) => v.id !== id),
     })),
 
-  clearVideos: () => set({ videos: [] }),
+  clearVideos: () => set({ videos: [], nextVideoId: 0 }),
+
+  getNextVideoId: () => get().nextVideoId,
+
+  resetVideoIdCounter: () => set({ nextVideoId: 0 }),
 }));
 
 interface dashBoardStatsState {

@@ -1,4 +1,4 @@
-import React, { forwardRef} from "react";
+import React, { forwardRef } from "react";
 import type { ChangeEvent } from "react";
 import uploadVideos from "../../Services/uploadVideos";
 import dashboardSection, {
@@ -18,10 +18,10 @@ interface InputFileProps {
 const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
   ({ type, id, name, accept, className }, ref) => {
 
-    const {setid , setActiveTab} = dashboardSection()
-    const {setIsUploading} = videoUploding()
-    const { addVideo } = uploadVideoProcessing();
-    const {userId} = useAuth()
+    const { setid, setActiveTab } = dashboardSection()
+    const { setIsUploading } = videoUploding()
+    const { addVideo, getNextVideoId } = uploadVideoProcessing();
+    const { userId } = useAuth()
     const handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
       e.preventDefault();
 
@@ -35,9 +35,12 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
       const files = Array.from(fileList);
       console.log("Files are: ", files);
 
+      // Capture the current offset so IDs continue from previous batches
+      const startId = getNextVideoId();
+
       files.forEach((file, index) => {
         addVideo({
-          id: index.toString(),
+          id: (startId + index).toString(),
           fileName: file.name,
           progress: 0,
           status: "UPLOADING",
@@ -53,8 +56,9 @@ const Inputfile = forwardRef<HTMLInputElement, InputFileProps>(
         await uploadVideos(
           files,
           userId!,
+          startId,
         );
-        
+
       } catch (error) {
         console.error("Error uploading files:", error);
         setIsUploading()
