@@ -10,7 +10,11 @@ import { uploadOnCloudinary } from "../Utils/cloudinary";
 import { ApiError } from "../Utils/apiError";
 import { ErrorMessage, ErrorStatus } from "../Enums/enums";
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const connection = new IORedis({
+  host: process.env.REDIS_HOST || "redis",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
+  maxRetriesPerRequest: null,
+});
 
 /* ---------------- PLAYLIST REWRITE HELPERS ---------------- */
 
@@ -119,12 +123,12 @@ export const processFileWorker = new Worker(
       if (!abs.endsWith(".ts")) continue;
 
       const normalized = abs.replace(/\\/g, "/");
-      const relativePath = normalized.replace("public/", "");
+      const relativePath = normalized.split("public/")[1];
 
       const upload = await uploadOnCloudinary(
         abs,
         "raw",
-        relativePath.replace(".ts", ""),
+        relativePath!.replace(".ts", ""),
         "ts",
       );
 
@@ -148,19 +152,19 @@ export const processFileWorker = new Worker(
     ====================================================== */
     for (const indexPath of indexFiles) {
       const normalized = indexPath.replace(/\\/g, "/");
-      const relativePath = normalized.replace("public/", "");
+      const relativePath = normalized.split("public/")[1];
 
       const upload = await uploadOnCloudinary(
         indexPath,
         "raw",
-        relativePath.replace(".m3u8", ""),
+        relativePath!.replace(".m3u8", ""),
         "m3u8",
       );
 
       if (!upload) throw new Error("Index Upload Failed");
 
       // store for master rewrite
-      const shortPath = relativePath.replace(`processed/${videoId}/`, "");
+      const shortPath = relativePath!.replace(`processed/${videoId}/`, "");
       indexUrlMap.set(shortPath, upload.secure_url);
 
       console.log("Index Uploaded:", shortPath);

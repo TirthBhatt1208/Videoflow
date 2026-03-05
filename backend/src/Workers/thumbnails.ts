@@ -11,7 +11,11 @@ import { publisher } from "./redisClient.js";
 import { addToProccessFileQueue } from "../Queues/proccesFile.js";
 import { addToVttFileQueue } from "../Queues/vttFile.js";
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const connection = new IORedis({
+  host: process.env.REDIS_HOST || "redis",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
+  maxRetriesPerRequest: null,
+});
 
 type thumbnails = {
   videoId: string;
@@ -22,7 +26,7 @@ type thumbnails = {
 export const thumbnailsWorker = new Worker(
   "thumbnails",
   async (job: Job) => {
-    const { videoId, originalUrl , userId , index } = job.data;
+    const { videoId, originalUrl, userId, index } = job.data;
 
     if (!videoId || !originalUrl) {
       throw new ApiError(

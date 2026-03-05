@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:8000",
+        target: "http://backend:8000",
         changeOrigin: true,
         configure: (proxy, options) => {
           proxy.on("error", (err, req, res) => {
@@ -27,6 +27,11 @@ export default defineConfig({
             console.log("✅ Proxy response:", proxyRes.statusCode, req.url);
           });
         },
+      },
+      "/socket.io": {
+        target: "http://backend:8000",
+        ws: true, // ← WebSocket ke liye zaroori!
+        changeOrigin: true,
       },
     },
   },

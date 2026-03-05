@@ -9,7 +9,7 @@ import MainContent from "./dashboard/MainContent";
 import Sidebar from "./dashboard/Sidebar";
 import Inputfile from "./dashboard/Inputfile";
 import UploadProccesing from "./videoUploading/UploadProccesing";
-import Videoplayer from "./Videoplayer/videoplayer";
+import Videoplayer from "./Videoplayer/videoPlayer";
 
 export {
   CTASection,

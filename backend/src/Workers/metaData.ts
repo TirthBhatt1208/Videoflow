@@ -8,13 +8,21 @@ import { addToProccessFileQueue } from "../Queues/proccesFile.js";
 import { publisher } from "./redisClient.js";
 import { addToThumbnailsQueue } from "../Queues/thumbnails.js";
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const connection = new IORedis({
+  host: process.env.REDIS_HOST || "redis",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
+  maxRetriesPerRequest: null,
+});
 
 export const metaDataWorker = new Worker(
   "metadata",
   async (job: Job) => {
-    const { originalUrl, videoId, userId , index } = job.data;
+    const { originalUrl, videoId, userId, index } = job.data;
 
+    console.log("metadata config check:", {
+      cloud_name: !!process.env.REDIS_HOST,
+      api_key: !!process.env.REDIS_PORT,
+    });
     if (!originalUrl || !videoId) {
       throw new ApiError(
         ErrorStatus.validationError,
@@ -78,7 +86,7 @@ export const metaDataWorker = new Worker(
       },
     });
 
-    await addToThumbnailsQueue({id: videoId , originalUrl } , userId , index);
+    await addToThumbnailsQueue({ id: videoId, originalUrl }, userId, index);
   },
   {
     connection,

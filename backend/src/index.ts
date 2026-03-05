@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config({path: "./.env"});
+dotenv.config({ override: false });
 import app from './app.js';
 import http from "http"
 import { Server } from 'socket.io';
@@ -12,7 +12,7 @@ const server = http.createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN,
+    origin: [process.env.CORS_ORIGIN! , process.env.SOCKET_ORIGIN!],
     methods: ["GET", "POST"]
   },
 });

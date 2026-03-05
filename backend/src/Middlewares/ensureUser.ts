@@ -17,15 +17,22 @@ export const ensureUser = asyncHandler(async (req, res, next) => {
   
   //console.log("name: " , name);
   
-  let user = await prisma.user.findUnique({
-    where: { clerkId: userId },
-  });
+ let user;
 
-  if (!user) {
-    user = await prisma.user.create({
-      data: { clerkId: userId , email: email || "" , name: name || "" },
-    });
-  }
+ try {
+   user = await prisma.user.create({
+     data: { clerkId: userId, email: email || "", name: name || "" },
+   });
+ } catch (e: any) {
+   // Unique constraint — user already exists, bas fetch karo
+   if (e?.code === "P2002") {
+     user = await prisma.user.findUnique({
+       where: { clerkId: userId },
+     });
+   } else {
+     throw e;
+   }
+ }
 
   req.user = user;
 

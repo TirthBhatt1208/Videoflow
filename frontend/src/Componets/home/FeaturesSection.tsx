@@ -42,12 +42,12 @@ const FeaturesSection: React.FC = () => {
             Experience the future of video processing with our cutting-edge features designed for scale and performance.
           </p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             const colors = colorMap[feature.color];
-            
+
             return (
               <div key={index} className="group relative p-8 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
                 <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity ${colors.iconBg}`}>

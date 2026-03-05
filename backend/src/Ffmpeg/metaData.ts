@@ -6,8 +6,10 @@ export const extractMetaData = (url: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     const ffmpeg = `ffprobe -v quiet -print_format json -show_format -show_streams "${url}"`;
 
-    exec(ffmpeg, (err, stdout) => {
+    exec(ffmpeg, (err, stdout , stderr) => {
       if (err) {
+         console.error("ffprobe stderr:", stderr); // ADD THIS
+         console.error("ffprobe error:", err.message);
         return reject(
           new ApiError(
             ErrorStatus.metadataFfmpegError,

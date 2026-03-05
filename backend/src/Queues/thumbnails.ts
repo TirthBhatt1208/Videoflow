@@ -1,6 +1,13 @@
 import { Queue } from "bullmq";
+import IORedis from "ioredis";
 
-const thumbnailsQueue = new Queue("thumbnails");
+const connection = new IORedis({
+  host: process.env.REDIS_HOST || "redis",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
+  maxRetriesPerRequest: null,
+});
+
+const thumbnailsQueue = new Queue("thumbnails", { connection });
 
 interface VideoJob {
   id: string;

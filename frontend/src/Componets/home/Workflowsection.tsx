@@ -19,15 +19,15 @@ const WorkflowSection: React.FC = () => {
             How VideoFlow Works
           </p>
         </div>
-        
+
         <div className="relative">
           {/* Connecting Line */}
           <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 border-t-2 border-dashed border-gray-200 -translate-y-1/2 z-0"></div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
             {steps.map((step, index) => {
               const Icon = step.icon;
-              
+
               return (
                 <div key={index} className="flex flex-col items-center text-center group">
                   <div className="w-16 h-16 rounded-full bg-white border-2 border-blue-500 text-blue-500 flex items-center justify-center shadow-lg mb-6 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300 relative">

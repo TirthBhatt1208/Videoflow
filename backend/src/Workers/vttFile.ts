@@ -8,7 +8,11 @@ import fs from "fs";
 import { glob } from "glob";
 import { uploadOnCloudinary } from "../Utils/cloudinary";
 
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const connection = new IORedis({
+  host: process.env.REDIS_HOST || "redis",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
+  maxRetriesPerRequest: null,
+});
 
 function secondsToTimestamp(sec: number) {
   const hrs = Math.floor(sec / 3600)

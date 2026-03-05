@@ -18,6 +18,11 @@ const uploadVideo = asyncHandler(async (req, res) => {
     throw new ApiError(ErrorStatus.uploadNoFile, ErrorMessage.uploadNoFile_400);
   }
 
+  console.log("Cloudinary config check:", {
+    cloud_name: !!process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: !!process.env.CLOUDINARY_API_KEY,
+    api_secret: !!process.env.CLOUDINARY_API_SECRET,
+  });
   const user = req.user;
   const savedVideos = [];
   console.log("Videos: ", videos)
