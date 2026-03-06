@@ -7,7 +7,8 @@ RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
+ARG DATABASE_URL
+RUN DATABASE_URL=$DATABASE_URL npx prisma generate
 # If using Alpine
 RUN apk add --no-cache ffmpeg
 
