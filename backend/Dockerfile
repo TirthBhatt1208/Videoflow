@@ -6,7 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npx prisma generate
+RUN npx prisma generate --no-engine
 # If using Alpine
 RUN apk add --no-cache ffmpeg
 
