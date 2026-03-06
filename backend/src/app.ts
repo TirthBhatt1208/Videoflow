@@ -16,7 +16,9 @@ app.use(express.static('public'))
 app.use(cookieParser())
 
 app.use(
-  clerkMiddleware(),
+  clerkMiddleware({
+    authorizedParties: [process.env.CORS_ORIGIN! , process.env.CLERK_CLIENT_ID!],
+  }),
 );
 app.use(ensureUser)
 
