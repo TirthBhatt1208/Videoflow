@@ -15,7 +15,11 @@ app.use(express.urlencoded({limit: "200mb", extended: true}))
 app.use(express.static('public'))
 app.use(cookieParser())
 
-app.use(clerkMiddleware())
+app.use(
+  clerkMiddleware({
+    authorizedParties: [process.env.CORS_ORIGIN! , process.env.CLERK_CLIENT_ID!],
+  }),
+);
 app.use(ensureUser)
 
 
