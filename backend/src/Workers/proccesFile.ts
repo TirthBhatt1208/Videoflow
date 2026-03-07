@@ -22,20 +22,20 @@ function rewriteIndexPlaylist(
   indexPath: string,
   segmentMap: Map<string, string>,
 ) {
+  // index file ka directory nikalo (e.g. .../v1/)
+  const indexDir = path.dirname(indexPath); // ✅ ADD THIS
+
   let lines = fs.readFileSync(indexPath, "utf8").split("\n");
 
   lines = lines.map((line) => {
     const trimmed = line.trim();
 
-    // sirf segment lines replace karo
     if (trimmed.endsWith(".ts")) {
-      for (const [localAbsPath, cloudUrl] of segmentMap.entries()) {
-        const fileName = path.basename(localAbsPath);
+      // absolute path banao is specific variant ka
+      const absoluteSegmentPath = path.join(indexDir, trimmed); // ✅ ADD THIS
 
-        if (trimmed === fileName) {
-          return cloudUrl;
-        }
-      }
+      const cloudUrl = segmentMap.get(absoluteSegmentPath); // ✅ DIRECT LOOKUP
+      if (cloudUrl) return cloudUrl;
     }
 
     return line;
