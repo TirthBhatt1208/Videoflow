@@ -52,57 +52,33 @@ function Videoplayer({ url, poster, thumbnailVttUrl }: Props) {
       const hls = new Hls({
         debug: false,
         enableWorker: true,
-        startLevel: -1, // Start in Auto mode — let ABR pick based on network speed
+        startLevel: -1,
+        abrEwmaDefaultEstimate: 5000000,
+        abrEwmaFastLive: 3.0,
+        abrEwmaSlowLive: 9.0,
       });
 
       hlsRef.current = hls;
       hls.loadSource(url);
       hls.attachMedia(video);
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        console.log("Available levels:", hls.levels);
+      hls.on(Hls.Events.MANIFEST_PARSED, (_, data) => {
+        const availableQualities = hls.levels.map((l) => l.height);
 
-        // Extract available quality heights and prepend 0 (Auto)
-        const qualityLevels = hls.levels.map((level) => level.height);
-        const qualityOptions = [0, ...qualityLevels]; // 0 = Auto
-
-        // Update Plyr quality options with Auto included
+        // Plyr ko batao via config, not direct assignment
         const plyr = plyrRef.current?.plyr;
-        if (plyr) {
-          plyr.quality = {
-            default: 0, // Default to Auto
-            options: qualityOptions,
-            forced: true,
-            onChange: (quality: number) => {
-              if (quality === 0) {
-                // Auto mode — let HLS.js decide based on network speed
-                hls.currentLevel = -1;
-                console.log("Quality set to Auto (ABR)");
-              } else {
-                // Find the HLS level matching the selected height
-                const levelIndex = hls.levels.findIndex(
-                  (level) => level.height === quality
-                );
-                if (levelIndex !== -1) {
-                  hls.currentLevel = levelIndex;
-                  console.log(`Quality forced to ${quality}p (level ${levelIndex})`);
-                }
-              }
-            },
-          };
+        if (!plyr) return;
 
-          // Override the quality label so "0" shows as "Auto"
-          plyr.i18n = {
-            ...plyr.i18n,
-            qualityLabel: {
-              0: "Auto",
-            },
-          };
-
-          console.log("Quality options added:", qualityOptions);
-        }
+        // Plyr custom quality event override
+        plyr.on("qualitychange", (event: any) => {
+          const quality = event.detail.quality;
+          if (quality === 0) {
+            hls.currentLevel = -1; // Auto
+          } else {
+            hls.currentLevel = hls.levels.findIndex((l) => l.height === quality);
+          }
+        });
       });
-
       hls.on(Hls.Events.LEVEL_SWITCHED, (_event, data) => {
         const level = hls.levels[data.level];
         console.log(`ABR switched to: ${level.height}p`);
