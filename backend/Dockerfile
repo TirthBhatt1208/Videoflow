@@ -13,4 +13,4 @@ RUN apk add --no-cache ffmpeg
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && npm run worker & npm start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && (npm run worker &) && npm start"]
