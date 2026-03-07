@@ -46,8 +46,8 @@ function Header() {
               className="hidden"
             />
           </button>
-          <div
-            onClick={() => handleTabClick('profile')}
+          <button
+            onClick={() => handleTabClick("profile")}
             className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer"
           >
             {user?.imageUrl ? (
@@ -60,7 +60,7 @@ function Header() {
               user!.firstName!.charAt(0).toUpperCase() +
               user?.lastName!.charAt(0).toUpperCase()
             )}
-          </div>
+          </button>
         </div>
       </div>
     </header>
