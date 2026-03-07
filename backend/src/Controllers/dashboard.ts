@@ -44,6 +44,7 @@ export const getStats = asyncHandler(async (req, res) => {
 
   const todayStats = await prisma.video.aggregate({
     where: {
+      userId: id,
       createdAt: {
         gte: startOfToday,
         lte: endOfToday,
