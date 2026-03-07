@@ -7,7 +7,12 @@ import dashboardSection  from "../../Store/store";
 function Header() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const {user} = useUser();
-  const {setActiveTab} = dashboardSection();
+  const {setActiveTab , setid} = dashboardSection();
+
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
+    setid(tab);
+  }
   return (
     <header className="bg-white border-b border-gray-200 px-8 py-4">
       <div className="flex items-center justify-between">
@@ -42,7 +47,7 @@ function Header() {
             />
           </button>
           <div
-            onClick={() => setActiveTab("profile")}
+            onClick={() => handleTabClick('profile')}
             className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-sm font-semibold cursor-pointer"
           >
             {user?.imageUrl ? (
